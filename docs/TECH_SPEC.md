@@ -146,7 +146,7 @@ POST /notify
 | Безопасность             | helmet, express-rate-limit, xss-clean, hpp |
 | Валидация входных данных | Joi                                        |
 | Планировщик задач        | node-schedule                              |
-| Логирование              | Winston                                    |
+| Логирование              | Winston, morgan                            |
 | Конфигурация окружения   | dotenv                                     |
 | Формат логов             | JSON + цветная консоль в dev               |
 | Кодировка                | UTF-8                                      |

@@ -7,4 +7,4 @@ NotifyMe — REST API-сервис управления и доставки пе
 ```bash
 npm install
 npm start
-
+```
