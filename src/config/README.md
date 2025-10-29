@@ -52,3 +52,19 @@ Unknown variables are ignored (`.unknown()` in Joi schema).
 
 ## Example Flow
 
+dotenv.config()  
+↓  
+validate(process.env) → { PORT, DEBUG }  
+↓  
+merge(cliParams, envValues)  
+↓  
+export default config
+
+
+---
+
+## Design Notes
+
+- CLI parameters always take precedence to simplify testing and quick overrides.
+- Empty values in `.env` are not considered defaults — they signal misconfiguration.
+- The configuration is loaded once and cached through Node’s module system.

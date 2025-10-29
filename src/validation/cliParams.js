@@ -2,7 +2,7 @@
 
 import { Command } from "commander";
 import { InvalidOptionArgumentError } from "../errors.js";
-import parsePort from "../validation/port.js";
+import parsePort from "./port.js";
 
 const program = new Command();
 
