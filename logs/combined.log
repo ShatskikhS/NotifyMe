@@ -1,9 +1,0 @@
-{"level":"info","message":"Server started"}
-{"level":"warn","message":"Low disk space"}
-{"level":"error","message":"Something went wrong"}
-{"level":"info","message":"Server started"}
-{"level":"warn","message":"Low disk space"}
-{"level":"error","message":"Something went wrong"}
-[2025-10-23 18:57:42] info: Server started
-[2025-10-23 18:57:42] warn: Low disk space
-[2025-10-23 18:57:42] error: Something went wrong
