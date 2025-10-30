@@ -5,7 +5,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import xss from "xss-clean";
 import hpp from "hpp";
-import { logger } from "./logger.js";
+import logger from "./logger.js";
 
 const app = express();
 app.use(express.json());
