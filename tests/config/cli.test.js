@@ -27,10 +27,10 @@ test.each(cases)(
     process.argv = process.argv.concat(input);
     vi.resetModules();
     if (expectedError) {
-      await expect(import("../../src/validation/cliParams.js")).rejects.toThrow();
+      await expect(import("../../src/config/cli.js")).rejects.toThrow();
     } else {
       const { default: options } = await import(
-        "../../src/validation/cliParams.js"
+        "../../src/config/cli.js"
       );
       expect(options).toEqual(expected);
     }

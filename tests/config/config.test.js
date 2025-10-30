@@ -1,11 +1,9 @@
 import { test, expect, vi } from "vitest";
 
 const cases = [
-  {
-    envOptions: { PORT: 3000 },
-    cliOptions: { port: 2000 },
-    expected: { port: 2000, debug: false },
-  },
+  { envOptions: { port: 3000, debug: true }, 
+  cliOptions: { port: 2000, debug:false }, 
+  expected: { port: 2000, debug: false } },
   { envOptions: {}, cliOptions: {}, expectedError: true },
 ];
 
@@ -13,10 +11,10 @@ test.each(cases)(
   "test params: %o",
   async ({ envOptions, cliOptions, expected, expectedError }) => {
     vi.resetModules();
-    vi.doMock("../../src/validation/cliParams.js", () => ({
+    vi.doMock("../../src/config/cli.js", () => ({
       default: cliOptions,
     }));
-    vi.doMock("../../src/validation/env.js", () => ({
+    vi.doMock("../../src/config/env.js", () => ({
       default: envOptions,
     }));
     if (expectedError) {

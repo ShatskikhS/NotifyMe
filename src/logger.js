@@ -1,30 +1,52 @@
 import winston from "winston";
-const { combine, timestamp, printf, colorize } = winston.format;
-import config from "./config/config.js"
+const { format, transports } = winston;
+const { combine, timestamp, printf, colorize, errors, json } = format;
+import config from "./config/config.js";
 
-const customTransports = [];
+const customTransports = [
+  new transports.File({
+    filename: "logs/combined.log",
+    maxsize: 5_000_000,
+    maxFiles: 5,
+    tailable: true,
+    format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), json()),
+  }),
+  new transports.File({
+    filename: "logs/error.log",
+    level: "error",
+    maxsize: 5_000_000,
+    maxFiles: 5,
+    tailable: true,
+    format: combine(
+      timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+      errors({ stack: true }),
+      json()
+    ),
+  }),
+];
 
-const logger = winston.createLogger({
-  transports: [
-    new winston.transports.File({
-      filename: "logs/combined.log",
-      level: config.debug ? "debug" : "info",
-      maxsize: 5_000_000,
-      maxFiles: 5,
-      tailable: true,
+if (config.debug)
+  customTransports.push(
+    new transports.Console({
       format: combine(
-        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        colorize(),
         printf(({ level, message, timestamp }) => {
           return `[${timestamp}] ${level}: ${message}`;
         })
-      )
-    }),
-    new winston.transports.Console(),
-  ],
+      ),
+    })
+  );
+
+const logger = winston.createLogger({
+  defaultMeta: { service: "notifyme" },
+  level: config.debug ? "debug" : "info",
+  transports: customTransports,
 });
 
-logger.info("Server started");
-logger.warn("Low disk space");
-logger.error("Something went wrong");
+export default logger;
 
-console.log(config.debug);
+logger.silly("SILLY message");
+logger.debug("DEBUG message"); // 🚫 не появится
+logger.info("INFO message");  // ✅ появится
+logger.error("ERROR message"); // ✅ появится

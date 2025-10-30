@@ -5,10 +5,11 @@ vi.mock("dotenv", () => ({
 }));
 
 const cases = [
-  { env: { PORT: "3000" }, expected: { PORT: 3000 } },
-  { env: { DEBUG: true }, expected: { DEBUG: true } },
-  { env: { PORT: "2000", DEBUG: true }, expected: { PORT: 2000, DEBUG: true } },
-  { env: { DEBUG: "" }, expected: { DEBUG: false } },
+  { env: { PORT: "3000" }, expected: { port: 3000 } },
+  { env: { PORT: "" }, expected: { port: undefined } },
+  { env: { DEBUG: true }, expected: { debug: true } },
+  { env: { PORT: "2000", DEBUG: true }, expected: { port: 2000, debug: true } },
+  { env: { DEBUG: "" }, expected: { debug: false } },
   { env: {}, expected: {} },
   { env: { DEBUG: "abc" }, expectedError: true },
   { env: { PORT: "abc" }, expectedError: true },
@@ -31,10 +32,10 @@ test.each(cases)(
     process.env = { ...env };
     vi.resetModules();
     if (expectedError) {
-      await expect(import("../../src/validation/env.js")).rejects.toThrow();
+      await expect(import("../../src/config/env.js")).rejects.toThrow();
     } else {
       const { default: envOptions } = await import(
-        "../../src/validation/env.js"
+        "../../src/config/env.js"
       );
       expect(envOptions).toEqual(expected);
     }
