@@ -11,10 +11,3 @@ export class CliOptionError extends Error {
     this.name = "CliOptionError";
   }
 }
-
-export class InvalidOptionArgumentError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "InvalidOptionArgumentError";
-  }
-}

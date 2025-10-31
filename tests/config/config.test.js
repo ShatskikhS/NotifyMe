@@ -1,9 +1,11 @@
 import { test, expect, vi } from "vitest";
 
 const cases = [
-  { envOptions: { port: 3000, debug: true }, 
-  cliOptions: { port: 2000, debug:false }, 
-  expected: { port: 2000, debug: false } },
+  { envOptions: { port: 3000, debug: true }, cliOptions: { port: 2000, debug: false }, expected: { port: 2000, debug: false } },
+  { envOptions: { debug: true }, cliOptions: { port: 2000, debug: false }, expected: { port: 2000, debug: false } },
+  { envOptions: { }, cliOptions: { port: 2000, debug: false }, expected: { port: 2000, debug: false } },
+  { envOptions: { debug: true }, cliOptions: { port: 2000 }, expected: { port: 2000, debug: true } },
+  { envOptions: { }, cliOptions: { port: 2000 }, expected: { port: 2000, debug: false } },
   { envOptions: {}, cliOptions: {}, expectedError: true },
 ];
 

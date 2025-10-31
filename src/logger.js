@@ -45,8 +45,3 @@ const logger = winston.createLogger({
 });
 
 export default logger;
-
-logger.silly("SILLY message");
-logger.debug("DEBUG message"); // 🚫 не появится
-logger.info("INFO message");  // ✅ появится
-logger.error("ERROR message"); // ✅ появится

@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import xss from "xss-clean";
 import hpp from "hpp";
 import logger from "./logger.js";
+import notifyRouter from "./routes/notify.js"
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,9 @@ app.use(hpp());
 // Глобальный обработчик ошибок
 // import errorHandler from './middlewares/errorHandler.js';
 // app.use(errorHandler);
+
+app.use("/notify", notifyRouter);
+
 app.use((_, res) => {
   res.status(404).json({ error: "Not Found" });
 });
