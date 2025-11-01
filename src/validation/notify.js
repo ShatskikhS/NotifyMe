@@ -34,13 +34,7 @@ const MAX_FUTURE_DAYS = 30; // максимум 30 дней вперед
 const debugMessages = {
   'string.base': 'Field must be a string',
   'any.required': 'Field is required',
-  'any.only': (context) => {
-    const field = context.key;
-    const validValues = Array.isArray(context.valids) 
-      ? context.valids.join(', ') 
-      : Object.values(context.valids).join(', ');
-    return `Invalid ${field}. Allowed values are: ${validValues}`;
-  },
+  'any.only': '"{#value}" is invalid value for {#label}. Allowed values are: {#valids}',
   'array.base': 'Field must be an array',
   'array.min': 'Array must contain at least {#limit} item',
   'array.unique': 'Array items must be unique',
