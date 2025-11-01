@@ -1,6 +1,5 @@
-import { test, expect, vi } from "vitest";
+import { test, expect } from "vitest";
 import optionsSchema from "../../src/validation/appOptions.js";
-import { error } from "winston";
 
 const cases = [
     { input: { port: "2000", debug: "true" }, expected: { port: 2000, debug: true } },
