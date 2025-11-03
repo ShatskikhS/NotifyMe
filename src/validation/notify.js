@@ -10,7 +10,7 @@ import { SOURCES, CHANNELS, PRIORITIES } from "../models/consts/notificationFiel
  * @param {Date} [data.sendAt] - Optional send time in ISO 8601 format (e.g. 2025-10-21T08:00:00Z)
  */
 
-const MAX_FUTURE_DAYS = 30; // максимум 30 дней вперед
+const MAX_FUTURE_DAYS = 30;
 
 const debugMessages = {
   "string.base": "Field must be a string",
