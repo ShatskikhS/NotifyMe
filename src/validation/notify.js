@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { SOURCES, CHANNELS, PRIORITIES } from "../models/consts/notificationFields.js"
 
 /** Validates incoming notification request
  * @param {Object} data
@@ -8,26 +9,6 @@ import Joi from "joi";
  * @param {Array<string>} data.channels - Channels to send the notification
  * @param {Date} [data.sendAt] - Optional send time in ISO 8601 format (e.g. 2025-10-21T08:00:00Z)
  */
-
-const SOURCES = Object.freeze({
-  TELEGRAM_BOT: "telegramBot",
-  DISCOUNTS_SCR: "discountsScr",
-  URGENT_EXTERNAL: "urgentExternal",
-  NEW_ROUTE: "newRoute",
-  BACKUP_SCRIPT: "backup_script",
-});
-
-const CHANNELS = Object.freeze({
-  TELEGRAM: "telegram",
-  LOGFILE: "logfile",
-  CONSOLE: "console",
-});
-
-const PRIORITIES = Object.freeze({
-  LOW: "low",
-  MEDIUM: "medium",
-  HIGH: "high",
-});
 
 const MAX_FUTURE_DAYS = 30; // максимум 30 дней вперед
 

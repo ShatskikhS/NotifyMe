@@ -1,7 +1,9 @@
-import express from 'express';
+import { Router } from 'express';
+import notifyController from "../controllers/notifyController.js"
 
 const router = express.Router();
 
-router.post("/", )
-
-export default router;
+export default function crateNotifyRouter({ config, logger }) {
+    router.post("/", notifyController(req, res, config, logger));
+    return router;
+}
