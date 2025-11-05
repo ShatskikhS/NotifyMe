@@ -6,3 +6,4 @@ coverage/
 logs/
 .tmp/
 playground/
+data/

@@ -62,7 +62,7 @@ class Notification {
    * Creates a Notification instance from a JSON object
    * @param {Object} obj - The JSON object
    * @returns {Notification}
-   * @throws {Error} When required fields are missing
+   * @throws {DeserializationError} When required fields are missing
    */
   static fromJSON(obj) {
     if (!obj) {
