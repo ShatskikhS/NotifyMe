@@ -7,7 +7,7 @@ const JSON_EXTENSION = ".json";
  * @typedef {Object} AppOptions
  * @property {number|undefined} port - Server port number
  * @property {boolean} debug - Debug mode flag
- * @property {string|undefined} notificationFileStorage - Path to notification storage file
+ * @property {string|undefined} notificationsFile - Path to notification storage file
  */
 
 /**
@@ -27,7 +27,7 @@ const optionsSchema = Joi.object({
 
   debug: Joi.boolean().falsy(""),
 
-  notificationFileStorage: Joi.alternatives()
+  notificationsFile: Joi.alternatives()
     .try(
       Joi.string().valid("").optional(), // empty string allowed
       Joi.string() // regular string - validated below
@@ -47,6 +47,7 @@ const optionsSchema = Joi.object({
       return value;
     })
     .optional(),
+
 }).unknown();
 
 export default optionsSchema;
