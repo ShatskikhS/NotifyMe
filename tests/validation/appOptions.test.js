@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import optionsSchema from "../../src/validation/appOptions.js";
+import optionsSchema from "../../src/validation/appOptionsSchema.js";
 
 const cases = [
   {
