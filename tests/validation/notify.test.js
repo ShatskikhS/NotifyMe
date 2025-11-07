@@ -1,5 +1,6 @@
 import { test, expect, describe } from "vitest";
 import createValidationSchema from "../../src/validation/notify.js";
+import { CHANNELS, SOURCES, PRIORITIES } from "../../src/models/consts/notificationFields.js";
 
 const testDate = new Date(Date.now() + 60 * 1000);
 
@@ -43,7 +44,7 @@ const errorCases = [
     },
     expectedMessages: {
       prod: "Invalid value",
-      debug: '"wrong source" is invalid value for "source". Allowed values are: [telegramBot, discountsScr, urgentExternal, newRoute, backup_script]',
+      debug: `"wrong source" is invalid value for "source". Allowed values are: [${Object.values(SOURCES).join(', ')}]`,
     },
   },
   {
@@ -54,7 +55,7 @@ const errorCases = [
     },
     expectedMessages: {
       prod: "Invalid value",
-      debug: '"1" is invalid value for "source". Allowed values are: [telegramBot, discountsScr, urgentExternal, newRoute, backup_script]',
+      debug: `"1" is invalid value for "source". Allowed values are: [${Object.values(SOURCES).join(', ')}]`,
     },
   },
   {
@@ -76,7 +77,7 @@ const errorCases = [
     },
     expectedMessages: {
       prod: "Invalid value",
-      debug: '"wrong priority" is invalid value for "priority". Allowed values are: [low, medium, high]',
+      debug: `"wrong priority" is invalid value for "priority". Allowed values are: [${Object.values(PRIORITIES).join(', ')}]`,
     },
   },
   {
@@ -108,7 +109,7 @@ const errorCases = [
     },
     expectedMessages: {
       prod: "Invalid value",
-      debug: '"invalid chanel" is invalid value for "channels[0]". Allowed values are: [telegram, logfile, console]',
+      debug: `"invalid chanel" is invalid value for "channels[0]". Allowed values are: [${Object.values(CHANNELS).join(', ')}]`,
     },
   },
   {

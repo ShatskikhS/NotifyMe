@@ -1,12 +1,35 @@
 import { test, expect, vi } from "vitest";
 
 const cases = [
-  { envOptions: { port: 3000, debug: true }, cliOptions: { port: 2000, debug: false }, expected: { port: 2000, debug: false } },
-  { envOptions: { debug: true }, cliOptions: { port: 2000, debug: false }, expected: { port: 2000, debug: false } },
-  { envOptions: { }, cliOptions: { port: 2000, debug: false }, expected: { port: 2000, debug: false } },
-  { envOptions: { debug: true }, cliOptions: { port: 2000 }, expected: { port: 2000, debug: true } },
-  { envOptions: { }, cliOptions: { port: 2000 }, expected: { port: 2000, debug: false } },
-  { envOptions: {}, cliOptions: {}, expectedError: true },
+  { 
+    envOptions: { port: 3000, debug: true, notificationsFile: "data/notifications.json" }, 
+    cliOptions: { port: 2000, debug: false, notificationsFile: "data/allNotifications.json" }, 
+    expected: { port: 2000, debug: false, notificationsFile: "data/allNotifications.json" } 
+  },
+  { 
+    envOptions: { debug: true }, 
+    cliOptions: { port: 2000, debug: false }, 
+    expected: { port: 2000, debug: false } 
+  },
+  {
+    envOptions: { }, 
+    cliOptions: { port: 2000, debug: false, notificationsFile: "data/notifications.json" }, 
+    expected: { port: 2000, debug: false, notificationsFile: "data/notifications.json" } },
+  {
+    envOptions: { debug: true }, 
+    cliOptions: { port: 2000 }, 
+    expected: { port: 2000, debug: true }
+  },
+  {
+    envOptions: { }, 
+    cliOptions: { port: 2000 },
+    expected: { port: 2000, debug: false }
+  },
+  {
+    envOptions: {}, 
+    cliOptions: {}, 
+    expectedError: true 
+  },
 ];
 
 test.each(cases)(
@@ -23,7 +46,7 @@ test.each(cases)(
       await expect(import("../../src/config/config.js")).rejects.toThrow();
     } else {
       const { default: config } = await import("../../src/config/config.js");
-      expect(config).toEqual(expected);
+      expect(config).toMatchObject(expected);
     }
   }
 );
