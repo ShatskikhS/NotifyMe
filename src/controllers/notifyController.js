@@ -1,6 +1,7 @@
 import createValidationSchema from "../validation/notify.js";
 import { NotificationValidationError } from "../errors.js"
 
+// контроллер для обработки post запроса на "/notify"
 export default function notifyController(req, res, config, logger) {
     const schema = createValidationSchema(config.debug);
     const { error, "value": notification } = schema.validate(req.body);

@@ -35,7 +35,7 @@ import { EnvironmentValueError } from "../errors.js";
  *   { port: 8080, notificationsFile: "custom.json" }
  * );
  */
-export class Config {
+export default class Config {
   /**
    * Creates a new Config instance.
    *
@@ -56,13 +56,3 @@ export class Config {
     this.notificationsFile = cliParams.notificationsFile ?? envParams.notificationsFile ?? "data/allNotifications.json";
   }
 }
-
-/**
- * Default application configuration instance.
- *
- * Automatically created by merging CLI and environment options.
- *
- * @type {Config}
- */
-const config = new Config();
-export default config;

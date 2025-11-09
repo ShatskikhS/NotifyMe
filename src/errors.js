@@ -45,6 +45,15 @@ export class NotificationValidationError extends ValidationError {
  */
 export class DataError extends NotifyMeError {}
 
+/**
+ * Error thrown when attempting to serialize data that cannot be converted to JSON.
+ *
+ * @class SerializationError
+ * @extends DataError
+ * @property {any|null} data - The data that failed to serialize.
+ * @example
+ * throw new SerializationError("Failed to serialize notification", faultyObject);
+ */
 export class SerializationError extends DataError {
   constructor(message, data = null) {
     super(message);
@@ -52,9 +61,74 @@ export class SerializationError extends DataError {
   }
 }
 
+/**
+ * Error thrown when attempting to parse invalid JSON data.
+ *
+ * @class DeserializationError
+ * @extends DataError
+ * @property {any|null} data - The data that failed to deserialize.
+ * @example
+ * throw new DeserializationError("Malformed JSON structure", invalidJsonString);
+ */
 export class DeserializationError extends DataError {
   constructor(message, data = null) {
     super(message);
     this.data = data;
+  }
+}
+
+/**
+ * Error thrown when attempting to add a record with an ID that already exists.
+ *
+ * @class DuplicateIdError
+ * @extends DataError
+ * @property {number} id - The conflicting record ID.
+ * @property {number} status - HTTP status code 409 (Conflict).
+ * @example
+ * throw new DuplicateIdError(42);
+ */
+export class DuplicateIdError extends DataError {
+  constructor(id) {
+    super(`Record with id "${id}" already exists`);
+    this.id = id;
+    this.status = 409;
+  }
+}
+
+/**
+ * Error thrown when a record with the specified ID cannot be found.
+ * Used for both update and delete operations.
+ *
+ * @class RecordNotFoundError
+ * @extends DataError
+ * @property {number} id - The missing record ID.
+ * @property {number} status - HTTP status code 404 (Not Found).
+ * @example
+ * throw new RecordNotFoundError(42);
+ */
+export class RecordNotFoundError extends DataError {
+  constructor(id) {
+    super(`Record with id "${id}" not found`);
+    this.id = id;
+    this.status = 404;
+  }
+}
+
+/**
+ * Error thrown when an existing JSON storage file is invalid
+ * or does not match the expected schema during initialization.
+ *
+ * @class InvalidStorageFileError
+ * @extends DataError
+ * @property {string} filePath - The path to the invalid JSON file.
+ * @property {number} status - HTTP status code 500 (Internal Server Error).
+ * @example
+ * throw new InvalidStorageFileError("/data/notifications.json");
+ */
+export class InvalidStorageFileError extends DataError {
+  constructor(filePath) {
+    super(`Invalid JSON storage structure in file: ${filePath}`);
+    this.filePath = filePath;
+    this.status = 500;
   }
 }

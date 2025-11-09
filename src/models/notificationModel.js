@@ -7,7 +7,7 @@ class Notification {
   /**
    * Creates a new Notification instance
    * @param {Object} params - The notification parameters
-   * @param {string} params.id - Unique identifier
+   * @param {number|undefined} [params.id] - Unique identifier
    * @param {string} params.source - Source of the notification
    * @param {string} [params.priority=PRIORITIES.LOW] - Priority level
    * @param {string} params.message - Notification message
@@ -18,7 +18,7 @@ class Notification {
    * @throws {Error} When required fields are missing or invalid
    */
   constructor({
-    id,
+    id = undefined,
     source,
     priority = PRIORITIES.LOW,
     message,
