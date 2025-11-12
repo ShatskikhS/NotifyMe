@@ -83,7 +83,7 @@ export default class FsNotifications {
    * Saves a Notification object to the storage.
    *
    * @param {import('../models/notificationModel.js').default} notification - Notification instance to save
-   * @returns {Promise<void>}
+   * @returns {Promise<number>}
    * @throws {DuplicateIdError} If the notification cannot be saved cause duplicated id
    */
   async saveAsync(notification) {
@@ -109,6 +109,8 @@ export default class FsNotifications {
     this.#allIDs.push(notification.id);
 
     this.#logger.info(`Notification ${notification.id} saved.`);
+
+    return notification.id;
   }
 
   /**
