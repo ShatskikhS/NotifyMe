@@ -11,7 +11,7 @@ import sendConsoleNotificationAsync from "../services/channels/console.js";
  * and processes it according to the application logic. Handles validation
  * errors and throws appropriate exceptions.
  *
- * Route: POST '/notify'
+ * Route: POST '/notifications'
  *
  * @param {import('express').Request} req - Express request object containing
  *   the notification data in req.body
@@ -41,7 +41,7 @@ import sendConsoleNotificationAsync from "../services/channels/console.js";
  * //   "sendAt": "2025-10-21T08:00:00Z"
  * // }
  */
-export default async function notifyController(
+export default async function postController(
   req,
   res,
   next,
@@ -64,7 +64,7 @@ export default async function notifyController(
 
     if (error) {
       logger.warn(
-        `Request params validation error. Route: ${req.baseUrl}, params: ${req.params}`
+        `POST notification params validation error. Route: ${req.baseUrl}, params: ${req.params}`
       );
       throw new NotificationValidationError(error);
     }
@@ -96,10 +96,9 @@ export default async function notifyController(
       notification.status = STATUSES.DELIVERED;
       await fsManager.updateAsync(notification);
       res.status(200).json({
-        status: "ok",
-        time: Date.now(),
+        status: notification.status,
         notificationId: notification.id,
-        notificationStatus: notification.status,
+        time: Date.now(),
       });
     }
   } catch (err) {

@@ -10,7 +10,7 @@ import MainLogger from "./logger.js";
 import Config from "./config/config.js";
 import FsNotifications from "./stores/fsStores.js";
 
-import crateNotifyRouter from "./routes/notifyRouter.js";
+import crateNotifyRouter from "./routes/notificationsRouter.js";
 
 const app = express();
 app.use(express.json());
@@ -28,10 +28,10 @@ const config = new Config();
 const mainLogger = new MainLogger({ debug: config.debug });
 const fsManager = new FsNotifications(config.notificationsFile, mainLogger);
 
-app.use("/notify", crateNotifyRouter(config, mainLogger, fsManager));
+app.use("/notifications", crateNotifyRouter(config, mainLogger, fsManager));
 
 app.get("/", (req, res) => {
-  mainLogger.info("Home GET-request");
+  mainLogger.info(`new request. Path: '/', method: ${req.method}`);
   res.status(200).json({ status: "ok", time: Date.now() });
 });
 

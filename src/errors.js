@@ -31,10 +31,30 @@ export class CliOptionError extends ConfigurationError {
 export class ValidationError extends NotifyMeError {}
 
 export class NotificationValidationError extends ValidationError {
+  /**
+   * 
+   * @param {import('joi').ValidationError} err 
+   */
   constructor(err) {
     super(err.message);
     this.annotation = err.annotate();
     this.details = err.details;
+    this.status = 400;
+    // TODO: After implementing the error handler, make sure all fields are required
+  }
+}
+
+export class IdValidationError extends ValidationError {
+  /**
+   * 
+   * @param {import('joi').ValidationError} err 
+   */
+  constructor(err, path, requestMethod) {
+    super(err.message);
+    this.annotation = err.annotate();
+    this.details = err.details;
+    this.path = path;
+    this.requestMethod = requestMethod;
     this.status = 400;
     // TODO: After implementing the error handler, make sure all fields are required
   }

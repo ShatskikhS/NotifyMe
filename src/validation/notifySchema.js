@@ -39,7 +39,7 @@ const productionMessages = {
   "date.less": "Invalid date",
 };
 
-const createValidationSchema = (debug = false) => {
+const createNotificationSchema = (debug = false) => {
   const messages = debug ? debugMessages : productionMessages;
 
   return Joi.object({
@@ -70,4 +70,4 @@ const createValidationSchema = (debug = false) => {
     });
 };
 
-export { createValidationSchema as default, SOURCES, CHANNELS, PRIORITIES };
+export { createNotificationSchema as default, SOURCES, CHANNELS, PRIORITIES };
