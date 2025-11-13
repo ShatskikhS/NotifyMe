@@ -152,3 +152,29 @@ export class InvalidStorageFileError extends DataError {
     this.status = 500;
   }
 }
+
+/**
+ * Domain (business logic) errors
+ */
+export class DomainError extends NotifyMeError {}
+
+/**
+ * Error thrown when attempting to perform an operation
+ * on a notification that is not scheduled for future delivery.
+ *
+ * @class NotScheduledNotificationError
+ * @extends DomainError
+ * @property {number} id - Notification ID.
+ * @property {string} reason - Explanation why it's not scheduled.
+ * @property {number} status - HTTP status code 409 (Conflict).
+ * @example
+ * throw new NotScheduledNotificationError(42, "missing sendAt field");
+ */
+export class NotScheduledNotificationError extends DomainError {
+  constructor(id, reason) {
+    super(`Notification with id "${id}" is not scheduled for future delivery (${reason}).`);
+    this.id = id;
+    this.reason = reason;
+    this.status = 409; // конфликт логического состояния
+  }
+}

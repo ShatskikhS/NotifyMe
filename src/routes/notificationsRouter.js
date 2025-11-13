@@ -1,7 +1,8 @@
 import { Router } from "express";
 import postController from "../controllers/notificationsPost.js";
 import getController from "../controllers/notificationsGet.js";
-import getIdController from "../controllers/notificationsGetId.js"
+import getIdController from "../controllers/notificationsGetId.js";
+import deleteIdController from "../controllers/notificationsDeleteId.js"
 
 /**
  * Creates and configures Express router for handling notifications.
@@ -44,6 +45,9 @@ export default function crateNotifyRouter(config, logger, fsManager) {
   );
   router.get("/:id", (req, res, next) =>
     getIdController(req, res, next, config, logger, fsManager)
+  );
+  router.delete("/:id", (req, res, next) =>
+    deleteIdController(req, res, next, config, logger, fsManager)
   );
 
   return router;
