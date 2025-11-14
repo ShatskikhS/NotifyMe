@@ -1,5 +1,5 @@
 import { test, expect, describe } from "vitest";
-import createValidationSchema from "../../src/validation/notify.js";
+import createValidationSchema from "../../src/validation/notifySchema.js";
 import { CHANNELS, SOURCES, PRIORITIES } from "../../src/models/consts/notificationFields.js";
 
 const testDate = new Date(Date.now() + 60 * 1000);

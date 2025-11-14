@@ -98,7 +98,7 @@ export default async function postController(
       res.status(200).json({
         status: notification.status,
         notificationId: notification.id,
-        time: Date.now(),
+        time: new Date(),
       });
     }
   } catch (err) {

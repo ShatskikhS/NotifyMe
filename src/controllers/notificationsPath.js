@@ -1,14 +1,8 @@
+import { updateNotificationSchema } from "../validation/notifySchema.js";
 import createIdSchema from "../validation/idSchema.js";
-import { IdValidationError } from "../errors.js";
+import { IdValidationError, NotificationValidationError } from "../errors.js";
 
 /**
- * GET request controller for handling requests to retrieve a specific notification by ID.
- *
- * Validates the notification ID parameter from the route, retrieves the notification
- * from storage, and returns it as JSON. Handles validation errors and not found cases
- * by throwing appropriate exceptions that are caught and passed to the error handler.
- *
- * Route: GET '/notifications/:id'
  *
  * @param {import('express').Request} req - Express request object containing the
  *   notification ID in req.params.id
@@ -22,18 +16,8 @@ import { IdValidationError } from "../errors.js";
  *   operations and errors during request processing
  * @param {import('../stores/fsStores.js').default} fsManager - FsNotifications
  *   instance for managing local JSON storage of notifications
- *
- * @throws {IdValidationError} When the ID parameter validation fails (invalid format,
- *   not a number, or less than 1)
- * @throws {RecordNotFoundError} When a notification with the specified ID is not found
- *
- * @returns {void}
- *
- * @example
- * // GET request to /notifications/42
- * // Returns: { id: 42, source: "system", message: "...", ... }
  */
-export default async function getIdController(
+export default async function pathController(
   req,
   res,
   next,
@@ -43,30 +27,50 @@ export default async function getIdController(
 ) {
   try {
     const idSchema = createIdSchema(config.debug);
-
     /**
      * Validation result containing error (if any) and validated value.
      * @type {{error?: import('joi').ValidationError, value: number}}
      */
-    const { error, value: currentId } = idSchema.validate(req.params.id);
+    const { error: idError, value: currentId } = idSchema.validate(
+      req.params.id
+    );
 
-    if (error) {
+    if (idError) {
       logger.warn(
         `id parameter validation error. Request: ${req.method} /notifications/${req.params.id}`
       );
       throw new IdValidationError(
-        error,
+        idError,
         `/notifications/${req.params.id}`,
         req.method
       );
     }
 
-    logger.debug(
-      `Processing a request to receive notification with id: ${currentId}.`
-    );
+    const notificationSchema = updateNotificationSchema(config.debug);
+    const { error: notificationError, value: fieldsToUpdate } =
+      notificationSchema.validate(req.body);
+    if (notificationError) {
+      logger.warn(
+        `Request body validation error. Request: ${req.method} /notifications/${req.params.id}`
+      );
+      throw new NotificationValidationError(notificationError);
+    }
 
-    const notification = await fsManager.findByIdAsync(currentId);
-    res.status(200).json(notification);
+    if ("sendAt" in fieldsToUpdate) {
+      //TODO: Добавить изменение данных в планировщике.
+    } else {
+      const notification = await fsManager.findByIdAsync(currentId);
+      Object.assign(notification, fieldsToUpdate);
+      await fsManager.updateAsync(notification);
+
+      logger.info(`Controller: Notification id: ${notification.id} successfully updated.`);
+
+      res.status(200).json({
+        status: "ok",
+        time: new Date(),
+        updated: notification,
+      });
+    }
   } catch (err) {
     next(err);
   }
