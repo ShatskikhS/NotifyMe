@@ -28,7 +28,12 @@ export class CliOptionError extends ConfigurationError {
 /**
  * Validation errors
  */
-export class ValidationError extends NotifyMeError {}
+export class ValidationError extends NotifyMeError {
+  constructor(message) {
+    super(message);
+    this.status = 400;
+  }
+}
 
 export class NotificationValidationError extends ValidationError {
   /**
@@ -37,10 +42,7 @@ export class NotificationValidationError extends ValidationError {
    */
   constructor(err) {
     super(err.message);
-    this.annotation = err.annotate();
     this.details = err.details;
-    this.status = 400;
-    // TODO: After implementing the error handler, make sure all fields are required
   }
 }
 
@@ -51,10 +53,7 @@ export class IdValidationError extends ValidationError {
    */
   constructor(err) {
     super(err.message);
-    this.annotation = err.annotate();
     this.details = err.details;
-    this.status = 400;
-    // TODO: After implementing the error handler, make sure all fields are required
   }
 }
 
