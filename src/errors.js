@@ -49,12 +49,10 @@ export class IdValidationError extends ValidationError {
    * 
    * @param {import('joi').ValidationError} err 
    */
-  constructor(err, path, requestMethod) {
+  constructor(err) {
     super(err.message);
     this.annotation = err.annotate();
     this.details = err.details;
-    this.path = path;
-    this.requestMethod = requestMethod;
     this.status = 400;
     // TODO: After implementing the error handler, make sure all fields are required
   }
@@ -108,8 +106,8 @@ export class DeserializationError extends DataError {
  * throw new DuplicateIdError(42);
  */
 export class DuplicateIdError extends DataError {
-  constructor(id) {
-    super(`Record with id "${id}" already exists`);
+  constructor(message, id) {
+    super(message);
     this.id = id;
     this.status = 409;
   }
@@ -127,8 +125,8 @@ export class DuplicateIdError extends DataError {
  * throw new RecordNotFoundError(42);
  */
 export class RecordNotFoundError extends DataError {
-  constructor(id) {
-    super(`Record with id "${id}" not found`);
+  constructor(message, id) {
+    super(message);
     this.id = id;
     this.status = 404;
   }

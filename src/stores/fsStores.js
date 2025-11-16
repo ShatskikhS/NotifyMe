@@ -33,14 +33,23 @@ export default class FsNotifications {
   #allIDs;
 
   /**
+   * true when server is running in debug mode
+   *
+   * @type {boolean}
+   * @private
+   */
+  #debugMode;
+
+  /**
    * Creates a new FsNotifications instance.
    *
    * @param {string} storagePath - Path to the JSON storage file
    * @param {import('../logger.js').default} logger - MainLogger instance for logging
    */
-  constructor(storagePath, logger) {
+  constructor(storagePath, logger, debugMode) {
     this.path = path.normalize(storagePath);
     this.#logger = logger;
+    this.#debugMode = debugMode;
 
     this.#initStorage();
 
@@ -89,7 +98,10 @@ export default class FsNotifications {
   async saveAsync(notification) {
     if (notification.id && this.#allIDs.includes(notification.id)) {
       this.#logger.warn(`Attempt to save duplicate ID ${notification.id}.`);
-      throw new DuplicateIdError(notification.id);
+      const message = this.#debugMode
+        ? `Record with id "${id}" already exists`
+        : "Invalid value";
+      throw new DuplicateIdError(message, notification.id);
     }
 
     this.#logger.info(`Saving new notification...`);
@@ -123,7 +135,10 @@ export default class FsNotifications {
   async findByIdAsync(id) {
     if (!this.#allIDs.includes(id)) {
       this.#logger.warn(`Attempted to find non-existent record ID ${id}.`);
-      throw new RecordNotFoundError(id);
+      const message = this.#debugMode
+        ? `Record with id '${id}' not found`
+        : "Invalid value";
+      throw new RecordNotFoundError(message, id);
     }
 
     this.#logger.debug(`Finding notification with ID ${id}.`);
@@ -156,7 +171,10 @@ export default class FsNotifications {
       this.#logger.warn(
         `Attempted to update missing record ID ${notification.id}.`
       );
-      throw new RecordNotFoundError(notification.id);
+      const message = this.#debugMode
+        ? `Record with id '${id}' not found`
+        : "Invalid value";
+      throw new RecordNotFoundError(message, id);
     }
 
     this.#logger.info(`Updating notification ${notification.id}.`);
@@ -180,7 +198,10 @@ export default class FsNotifications {
   async deleteAsync(id) {
     if (!this.#allIDs.includes(id)) {
       this.#logger.warn(`Attempted to delete missing record ID ${id}.`);
-      throw new RecordNotFoundError(id);
+      const message = this.#debugMode
+        ? `Record with id '${id}' not found`
+        : "Invalid value";
+      throw new RecordNotFoundError(message, id);
     }
 
     this.#logger.info(`Deleting notification ${id}.`);

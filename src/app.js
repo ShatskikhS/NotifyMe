@@ -12,6 +12,22 @@ import FsNotifications from "./stores/fsStores.js";
 
 import crateNotifyRouter from "./routes/notificationsRouter.js";
 
+import createGlobalErrorHandler from "./middlewares/globalErrorHandler.js";
+
+let config;
+let mainLogger;
+let fsManager;
+
+try {
+  config = new Config();
+  mainLogger = new MainLogger({ debug: config.debug });
+  fsManager = new FsNotifications(config.notificationsFile, mainLogger, config.debug);
+} catch (err) {
+  console.error("Failed to initialize application configuration:");
+  console.error(err.message);
+  process.exit(1);
+}
+
 const app = express();
 app.use(express.json());
 app.use(helmet());
@@ -19,17 +35,7 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 100 }));
 // app.use(xss());
 app.use(hpp());
 
-// TODO: добавить:
-// Глобальный обработчик ошибок
-// import errorHandler from './middlewares/errorHandler.js';
-// app.use(errorHandler);
-
-const config = new Config();
-const mainLogger = new MainLogger({ debug: config.debug });
-const fsManager = new FsNotifications(config.notificationsFile, mainLogger);
-
 app.use("/notifications", crateNotifyRouter(config, mainLogger, fsManager));
-
 app.get("/", (req, res) => {
   mainLogger.info(`new request. Path: '/', method: ${req.method}`);
   res.status(200).json({ status: "ok", time: Date.now() });
@@ -38,6 +44,8 @@ app.get("/", (req, res) => {
 app.use((_, res) => {
   res.status(404).json({ error: "Not Found" });
 });
+
+app.use(createGlobalErrorHandler(config, mainLogger));
 
 export default app;
 export { config, mainLogger };
