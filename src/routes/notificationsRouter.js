@@ -4,7 +4,6 @@ import getController from "../controllers/notificationsGet.js";
 import getIdController from "../controllers/notificationsGetId.js";
 import deleteIdController from "../controllers/notificationsDeleteId.js";
 import pathController from "../controllers/notificationsPath.js";
-import errorHandlerAsync from "../middlewares/notificationsErrorHandler.js";
 
 /**
  * Creates and configures Express router for handling notifications.
@@ -53,9 +52,6 @@ export default function crateNotifyRouter(config, logger, fsManager) {
   );
   router.patch("/:id", (req, res, next) =>
     pathController(req, res, next, config, logger, fsManager)
-  );
-  router.use((err, req, res, next) =>
-    errorHandlerAsync(err, req, res, next, config, logger, fsManager)
   );
 
   return router;

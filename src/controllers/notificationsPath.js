@@ -1,6 +1,6 @@
 import { updateNotificationSchema } from "../validation/notifySchema.js";
 import createIdSchema from "../validation/idSchema.js";
-import { IdValidationError, NotificationValidationError } from "../errors.js";
+import { IdValidationError, NotificationValidationError, NotScheduledNotificationError } from "../errors.js";
 
 /**
  *
@@ -56,10 +56,23 @@ export default async function pathController(
       throw new NotificationValidationError(notificationError);
     }
 
+    const notification = await fsManager.findByIdAsync(currentId);
+
+    if (!notification.sendAt || (new Date(notification.sendAt) <= new Date())) {
+      const clientIp = req.ip || 'unknown';
+      const userAgent = req.headers['user-agent'] || 'unknown';
+      logger.warn(
+        `NotScheduledNotificationError error handled: 409 Conflict - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`
+      );
+      const message = config.debug
+        ? `The attempt to update unscheduled id ${currentId} notification has been rejected.`
+        : "Invalid request";
+      throw new NotScheduledNotificationError(currentId, message);
+    }
+
     if ("sendAt" in fieldsToUpdate) {
       //TODO: Добавить изменение данных в планировщике.
     } else {
-      const notification = await fsManager.findByIdAsync(currentId);
       Object.assign(notification, fieldsToUpdate);
       await fsManager.updateAsync(notification);
 

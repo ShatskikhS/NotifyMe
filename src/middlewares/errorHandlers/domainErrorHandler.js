@@ -1,46 +1,45 @@
-import { ValidationError } from "../../errors.js";
+import { DomainError } from "../../errors.js";
 import { STATUS_TEXT } from "../../models/consts/statusTexts.js";
 
 /**
- * Creates an Express error handler middleware for validation errors.
+ * Creates an Express error handler middleware for domain errors.
  *
  * This factory function returns an error handler that specifically handles
- * ValidationError instances. If the error is not a ValidationError, it passes
+ * DomainError instances. If the error is not a DomainError, it passes
  * it to the next error handler in the middleware chain.
  *
  * @param {import('../../config/config.js').default} config - Application configuration
  *   instance containing settings (e.g., debug mode)
  * @param {import('../../logger.js').default} logger - MainLogger instance for logging
  *   operations and errors during request processing (used for debug-level logging when
- *   validation errors are handled)
+ *   domain errors are handled)
  * @returns {function(Error, import('express').Request, import('express').Response, import('express').NextFunction): void}
  *   Express error handler middleware function
  *
  * @example
  * // In app.js
- * app.use(createValidationErrorHandler(config, mainLogger));
+ * app.use(createDomainErrorHandler(config, mainLogger));
  */
-export default function createValidationErrorHandler(config, logger) {
+export default function createDomainErrorHandler(config, logger) {
   /**
-   * Express error handler middleware for validation errors.
+   * Express error handler middleware for domain errors.
    *
-   * Handles ValidationError instances by converting them into HTTP responses
-   * with appropriate status codes and error messages. Logs the error handling
-   * event at debug level. In debug mode, includes additional details and 
-   * timestamp in the response.
+   * Handles DomainError instances by converting them into HTTP responses
+   * with appropriate status codes and error messages. In debug mode, includes
+   * additional details and timestamp.
    *
-   * @param {Error | ValidationError} err - The error object to handle
+   * @param {Error | DomainError} err - The error object to handle
    * @param {import('express').Request} req - Express request object
    * @param {import('express').Response} res - Express response object for sending
    *   the HTTP response
    * @param {import('express').NextFunction} next - Express next middleware function
-   *   for error handling (used to pass non-validation errors to the next handler)
+   *   for error handling (used to pass non-domain errors to the next handler)
    */
-  return function validationErrorHandler(err, req, res, next) {
-    if (!(err instanceof ValidationError)) return next(err);
+  return function domainErrorHandler(err, req, res, next) {
+    if (!(err instanceof DomainError)) return next(err);
 
     logger.debug(
-      `Validation error handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl}`
+      `Domain error handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl}`
     );
 
     res.status(err.status).json({

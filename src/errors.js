@@ -168,10 +168,9 @@ export class DomainError extends NotifyMeError {}
  * throw new NotScheduledNotificationError(42, "missing sendAt field");
  */
 export class NotScheduledNotificationError extends DomainError {
-  constructor(id, reason) {
-    super(`Notification with id "${id}" is not scheduled for future delivery (${reason}).`);
+  constructor(id, message) {
+    super(message);
     this.id = id;
-    this.reason = reason;
-    this.status = 409; // конфликт логического состояния
+    this.status = 409;
   }
 }

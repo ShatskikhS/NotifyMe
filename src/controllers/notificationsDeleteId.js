@@ -25,8 +25,7 @@ import { IdValidationError, NotScheduledNotificationError } from "../errors.js";
  *
  * @throws {IdValidationError} When the ID parameter validation fails (invalid format,
  *   not a number, or less than 1)
- * @throws {NotScheduledNotificationError} When sendAt time already passed or missing
- *   sendAt field
+ * @throws {NotScheduledNotificationError} When sendAt time already passed
  *
  * @returns {void}
  *
@@ -64,18 +63,16 @@ export default async function deleteIdController(
 
     const notification = await fsManager.findByIdAsync(currentId);
 
-    if (!notification.sendAt) {
-      throw new NotScheduledNotificationError(
-        currentId,
-        "missing sendAt field"
+    if (!notification.sendAt || (new Date(notification.sendAt) <= new Date())) {
+      const clientIp = req.ip || 'unknown';
+      const userAgent = req.headers['user-agent'] || 'unknown';
+      logger.warn(
+        `NotScheduledNotificationError error handled: 409 Conflict - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`
       );
-    }
-
-    if (new Date(notification.sendAt) <= new Date()) {
-      throw new NotScheduledNotificationError(
-        currentId,
-        "sendAt time already passed"
-      );
+      const message = config.debug
+        ? `The attempt to delete unscheduled id ${currentId} notification has been rejected.`
+        : "Invalid request";
+      throw new NotScheduledNotificationError(currentId, message);
     }
 
     await fsManager.deleteAsync(currentId);

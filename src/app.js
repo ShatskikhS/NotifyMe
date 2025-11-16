@@ -13,6 +13,7 @@ import FsNotifications from "./stores/fsStores.js";
 import crateNotifyRouter from "./routes/notificationsRouter.js";
 
 import createValidationErrorHandler from "./middlewares/errorHandlers/validationErrorHandler.js";
+import createDomainErrorHandler from "./middlewares/errorHandlers/domainErrorHandler.js";
 import createGlobalErrorHandler from "./middlewares/errorHandlers/globalErrorHandler.js";
 
 let config;
@@ -47,6 +48,7 @@ app.use((_, res) => {
 });
 
 app.use(createValidationErrorHandler(config, mainLogger));
+app.use(createDomainErrorHandler(config, mainLogger));
 app.use(createGlobalErrorHandler(config, mainLogger));
 
 export default app;

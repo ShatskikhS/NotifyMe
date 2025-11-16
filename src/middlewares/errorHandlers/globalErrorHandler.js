@@ -21,7 +21,7 @@ export default function createGlobalErrorHandler(config, logger) {
   return function globalErrorHandler(err, req, res, _) {
     const tag = err instanceof NotifyMeError ? "NotifyMeError" : "UnknownError";
     logger.error(
-      `${tag}] ${req.method} ${req.originalUrl}\n${err.stack || err.message}`
+      `[${tag}] ${req.method} ${req.originalUrl}\n${err.stack || err.message}`
     );
 
     res.status(err.status ?? 500).json({
