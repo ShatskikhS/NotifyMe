@@ -204,7 +204,7 @@ export default class FsNotifications {
       throw new RecordNotFoundError(message, id);
     }
 
-    this.#logger.info(`Deleting notification ${id}.`);
+    this.#logger.debug(`Deleting notification ${id}.`);
     const allNotifications = await this.findAllAsync();
     delete allNotifications[id];
     await fsPromises.writeFile(
