@@ -2,11 +2,11 @@ import { ValidationError } from "../../errors.js";
 import { STATUS_TEXT } from "../../models/consts/statusTexts.js";
 
 /**
- * Creates an Express error handler middleware for validation errors.
+ * Express error handler middleware factory for validation errors.
  *
- * This factory function returns an error handler that specifically handles
- * ValidationError instances. If the error is not a ValidationError, it passes
- * it to the next error handler in the middleware chain.
+ * Returns an error handler that specifically handles ValidationError instances.
+ * If the error is not a ValidationError, it passes it to the next error handler
+ * in the middleware chain.
  *
  * @param {import('../../config/config.js').default} config - Application configuration
  *   instance containing settings (e.g., debug mode)
@@ -18,25 +18,10 @@ import { STATUS_TEXT } from "../../models/consts/statusTexts.js";
  *
  * @example
  * // In app.js
- * app.use(createValidationErrorHandler(config, mainLogger));
+ * app.use(validationErrorHandler(config, mainLogger));
  */
-export default function createValidationErrorHandler(config, logger) {
-  /**
-   * Express error handler middleware for validation errors.
-   *
-   * Handles ValidationError instances by converting them into HTTP responses
-   * with appropriate status codes and error messages. Logs the error handling
-   * event at debug level. In debug mode, includes additional details and 
-   * timestamp in the response.
-   *
-   * @param {Error | ValidationError} err - The error object to handle
-   * @param {import('express').Request} req - Express request object
-   * @param {import('express').Response} res - Express response object for sending
-   *   the HTTP response
-   * @param {import('express').NextFunction} next - Express next middleware function
-   *   for error handling (used to pass non-validation errors to the next handler)
-   */
-  return function validationErrorHandler(err, req, res, next) {
+export default function validationErrorHandler(config, logger) {
+  return (err, req, res, next) => {
     if (!(err instanceof ValidationError)) return next(err);
 
     logger.debug(

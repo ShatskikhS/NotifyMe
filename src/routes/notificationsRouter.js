@@ -4,13 +4,14 @@ import getController from "../controllers/notificationsGet.js";
 import getIdController from "../controllers/notificationsGetId.js";
 import deleteIdController from "../controllers/notificationsDeleteId.js";
 import pathController from "../controllers/notificationsPath.js";
+import validateIdMiddleware from "../middlewares/validateId.js";
 
 /**
  * Creates and configures Express router for handling notifications.
  *
- * Creates a new Express router instance and registers a POST route
- * for handling incoming notification creation requests. The route expects
- * a JSON request body with notification data (source, message, channels, priority, sendAt).
+ * Creates a new Express router instance and registers routes for handling
+ * notification operations. The ID validation middleware is automatically applied
+ * to all routes with the :id parameter using router.param().
  *
  * @param {import('../config/config.js').default} config - Application configuration instance,
  *   containing application settings, including debug mode
@@ -19,8 +20,7 @@ import pathController from "../controllers/notificationsPath.js";
  * @param {import('../stores/fsStores.js').default} fsManager - FsNotifications instance
  *   for working with local JSON storage of notifications
  *
- * @returns {import('express').Router} Configured Express router with registered
- *   POST route "/" for handling notifications
+ * @returns {import('express').Router} Configured Express router with registered routes
  *
  * @example
  * // Usage in app.js:
@@ -38,21 +38,14 @@ import pathController from "../controllers/notificationsPath.js";
 export default function crateNotifyRouter(config, logger, fsManager) {
   const router = Router();
 
-  router.post("/", (req, res, next) =>
-    postController(req, res, next, config, logger, fsManager)
-  );
-  router.get("/", (req, res, next) =>
-    getController(req, res, next, logger, fsManager)
-  );
-  router.get("/:id", (req, res, next) =>
-    getIdController(req, res, next, config, logger, fsManager)
-  );
-  router.delete("/:id", (req, res, next) =>
-    deleteIdController(req, res, next, config, logger, fsManager)
-  );
-  router.patch("/:id", (req, res, next) =>
-    pathController(req, res, next, config, logger, fsManager)
-  );
+  // Register ID validation middleware for all routes with :id parameter
+  router.param("id", validateIdMiddleware(config, logger));
+
+  router.post("/", postController(config, logger, fsManager));
+  router.get("/", getController(logger, fsManager));
+  router.get("/:id", getIdController(config, logger, fsManager));
+  router.delete("/:id", deleteIdController(config, logger, fsManager));
+  router.patch("/:id", pathController(config, logger, fsManager));
 
   return router;
 }

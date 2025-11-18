@@ -12,9 +12,9 @@ import FsNotifications from "./stores/fsStores.js";
 
 import crateNotifyRouter from "./routes/notificationsRouter.js";
 
-import createValidationErrorHandler from "./middlewares/errorHandlers/validationErrorHandler.js";
-import createDomainErrorHandler from "./middlewares/errorHandlers/domainErrorHandler.js";
-import createGlobalErrorHandler from "./middlewares/errorHandlers/globalErrorHandler.js";
+import validationErrorHandler from "./middlewares/errorHandlers/validationErrorHandler.js";
+import domainErrorHandler from "./middlewares/errorHandlers/domainErrorHandler.js";
+import globalErrorHandler from "./middlewares/errorHandlers/globalErrorHandler.js";
 
 let config;
 let mainLogger;
@@ -47,9 +47,9 @@ app.use((_, res) => {
   res.status(404).json({ error: "Not Found" });
 });
 
-app.use(createValidationErrorHandler(config, mainLogger));
-app.use(createDomainErrorHandler(config, mainLogger));
-app.use(createGlobalErrorHandler(config, mainLogger));
+app.use(validationErrorHandler(config, mainLogger));
+app.use(domainErrorHandler(config, mainLogger));
+app.use(globalErrorHandler(config, mainLogger));
 
 export default app;
 export { config, mainLogger };
