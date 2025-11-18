@@ -1,5 +1,5 @@
 import createIdSchema from "../validation/idSchema.js";
-import { IdValidationError, RecordNotFoundDomainError } from "../errors.js";
+import { IdValidationError} from "../errors.js";
 
 /**
  * Middleware for validating notification ID parameter from route.

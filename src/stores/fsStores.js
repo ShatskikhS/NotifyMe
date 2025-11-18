@@ -6,6 +6,7 @@ import {
   DuplicateIdError,
   RecordNotFoundError,
   InvalidStorageFileError,
+  DeserializationError,
 } from "../errors.js";
 
 /**
@@ -41,19 +42,27 @@ export default class FsNotifications {
   #debugMode;
 
   /**
+   * Validated storage path
+   * 
+   * @type {string}
+   * @private
+   */
+  #path;
+
+  /**
    * Creates a new FsNotifications instance.
    *
    * @param {string} storagePath - Path to the JSON storage file
    * @param {import('../logger.js').default} logger - MainLogger instance for logging
    */
   constructor(storagePath, logger, debugMode) {
-    this.path = path.normalize(storagePath);
+    this.#path = path.normalize(storagePath);
     this.#logger = logger;
     this.#debugMode = debugMode;
 
     this.#initStorage();
 
-    const rawData = fs.readFileSync(this.path);
+    const rawData = fs.readFileSync(this.#path);
     this.#allIDs = Object.keys(JSON.parse(rawData)).map(Number);
     this.#logger.debug(
       `Storage initialized with ${this.#allIDs.length} records.`
@@ -67,14 +76,14 @@ export default class FsNotifications {
    * @private
    */
   #initStorage() {
-    if (!fs.existsSync(this.path)) {
-      fs.writeFileSync(this.path, JSON.stringify({}), { flag: "w" });
+    if (!fs.existsSync(this.#path)) {
+      fs.writeFileSync(this.#path, JSON.stringify({}), { flag: "w" });
       this.#logger.info(
-        `Storage file '${this.path}' not found — created new empty JSON storage.`
+        `Storage file '${this.#path}' not found — created new empty JSON storage.`
       );
     } else {
       // TODO: validate existing file.
-      this.#logger.info(`Existing storage file '${this.path}' loaded.`);
+      this.#logger.info(`Existing storage file '${this.#path}' loaded.`);
     }
   }
 
@@ -99,7 +108,7 @@ export default class FsNotifications {
     if (notification.id && this.#allIDs.includes(notification.id)) {
       this.#logger.warn(`Attempt to save duplicate ID ${notification.id}.`);
       const message = this.#debugMode
-        ? `Record with id "${id}" already exists`
+        ? `Record with id "${notification.id}" already exists`
         : "Invalid value";
       throw new DuplicateIdError(message, notification.id);
     }
@@ -115,7 +124,7 @@ export default class FsNotifications {
 
     allNotifications[notification.id] = notification;
     await fsPromises.writeFile(
-      this.path,
+      this.#path,
       JSON.stringify(allNotifications, null, 2)
     );
     this.#allIDs.push(notification.id);
@@ -129,8 +138,9 @@ export default class FsNotifications {
    * Finds a notification by its ID.
    *
    * @param {number} id - The notification ID to search for
-   * @returns {Promise<import('../models/notificationModel.js').default|null>} Notification instance if found, null otherwise
+   * @returns {Promise<import('../models/notificationModel.js').default>} Notification instance if found
    * @throws {RecordNotFoundError} If a record with the required ID is not found.
+   * @throws {DeserializationError} If the stored data cannot be deserialized into a Notification instance.
    */
   async findByIdAsync(id) {
     if (!this.#allIDs.includes(id)) {
@@ -154,8 +164,8 @@ export default class FsNotifications {
    * @returns {Promise<Object<number, import('../models/notificationModel.js').default>>} Object mapping notification IDs to Notification instances
    */
   async findAllAsync() {
-    this.#logger.debug(`Reading all notifications from '${this.path}'.`);
-    const rawData = await fsPromises.readFile(this.path);
+    this.#logger.debug(`Reading all notifications from '${this.#path}'.`);
+    const rawData = await fsPromises.readFile(this.#path);
     return JSON.parse(rawData);
   }
 
@@ -172,16 +182,16 @@ export default class FsNotifications {
         `Attempted to update missing record ID ${notification.id}.`
       );
       const message = this.#debugMode
-        ? `Record with id '${id}' not found`
+        ? `Record with id '${notification.id}' not found`
         : "Invalid value";
-      throw new RecordNotFoundError(message, id);
+      throw new RecordNotFoundError(message, notification.id);
     }
 
     this.#logger.info(`Updating notification ${notification.id}.`);
     const allNotifications = await this.findAllAsync();
     allNotifications[notification.id] = notification;
     await fsPromises.writeFile(
-      this.path,
+      this.#path,
       JSON.stringify(allNotifications, null, 2)
     );
 
@@ -208,7 +218,7 @@ export default class FsNotifications {
     const allNotifications = await this.findAllAsync();
     delete allNotifications[id];
     await fsPromises.writeFile(
-      this.path,
+      this.#path,
       JSON.stringify(allNotifications, null, 2)
     );
 
@@ -216,5 +226,16 @@ export default class FsNotifications {
     this.#logger.debug(
       `Notification ${id} deleted. Remaining count: ${this.#allIDs.length}`
     );
+  }
+
+  /**
+   * Checks if a notification with the given ID exists in storage.
+   * Uses the cached list of IDs for fast lookup without reading the file.
+   *
+   * @param {number} id - The notification ID to check
+   * @returns {boolean} true if the ID exists in storage, false otherwise
+   */
+  hasId(id) {
+    return this.#allIDs.includes(id);
   }
 }

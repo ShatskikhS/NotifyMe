@@ -5,6 +5,7 @@ import getIdController from "../controllers/notificationsGetId.js";
 import deleteIdController from "../controllers/notificationsDeleteId.js";
 import pathController from "../controllers/notificationsPath.js";
 import validateIdMiddleware from "../middlewares/validateId.js";
+import checkRecordExistsMiddleware from "../middlewares/checkRecordExistsMiddleware.js"
 
 /**
  * Creates and configures Express router for handling notifications.
@@ -40,6 +41,7 @@ export default function crateNotifyRouter(config, logger, fsManager) {
 
   // Register ID validation middleware for all routes with :id parameter
   router.param("id", validateIdMiddleware(config, logger));
+  router.param("id", checkRecordExistsMiddleware(config, logger, fsManager));
 
   router.post("/", postController(config, logger, fsManager));
   router.get("/", getController(logger, fsManager));

@@ -6,4 +6,3 @@ const STATUS_TEXT = Object.freeze({
 });
 
 export{ STATUS_TEXT }
-// `Notification with id "${id}" is not scheduled for future delivery (${reason}).`
