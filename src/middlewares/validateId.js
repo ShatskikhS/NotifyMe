@@ -34,9 +34,6 @@ export default function validateIdMiddleware(config, logger) {
       const { error, value: validatedId } = idSchema.validate(req.params.id);
 
       if (error) {
-        logger.warn(
-          `id parameter validation error. Request: ${req.method} /notifications/${req.params.id}`
-        );
         throw new IdValidationError(error);
       }
 

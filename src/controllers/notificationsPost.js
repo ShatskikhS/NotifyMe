@@ -56,9 +56,6 @@ export default function postController(config, logger, fsManager) {
       const { error, value: rawNotification } = schema.validate(req.body);
 
       if (error) {
-        logger.warn(
-          `POST notification params validation error. Route: ${req.baseUrl}, params: ${req.params}`
-        );
         throw new NotificationValidationError(error);
       }
 

@@ -17,7 +17,7 @@ export class NotifyMeError extends Error {
  * @class ConfigurationError
  * @extends NotifyMeError
  */
-export class ConfigurationError extends NotifyMeError {}
+export class ConfigurationError extends NotifyMeError { }
 
 /**
  * Error thrown when an environment variable has an invalid value.
@@ -25,7 +25,7 @@ export class ConfigurationError extends NotifyMeError {}
  * @class EnvironmentValueError
  * @extends ConfigurationError
  */
-export class EnvironmentValueError extends ConfigurationError {}
+export class EnvironmentValueError extends ConfigurationError { }
 
 /**
  * Error thrown when a CLI option has an invalid value.
@@ -33,7 +33,7 @@ export class EnvironmentValueError extends ConfigurationError {}
  * @class CliOptionError
  * @extends ConfigurationError
  */
-export class CliOptionError extends ConfigurationError {}
+export class CliOptionError extends ConfigurationError { }
 
 /**
  * Error thrown when an existing JSON storage file is invalid
@@ -54,6 +54,9 @@ export class InvalidStorageFileError extends EnvironmentValueError {
 
 /**
  * Validation errors.
+ *
+ * Handles only errors resulting from user data validation.
+ * Errors resulting from application startup parameter validation are handled in the ConfigurationError class.
  *
  * @class ValidationError
  * @extends NotifyMeError
@@ -121,7 +124,7 @@ export class DataError extends NotifyMeError {
  * @example
  * throw new SerializationError("Failed to serialize notification");
  */
-export class SerializationError extends DataError {}
+export class SerializationError extends DataError { }
 
 /**
  * Error thrown when attempting to parse invalid JSON data.
@@ -198,7 +201,7 @@ export class RecordNotFoundError extends DataError {
  * @class DomainError
  * @extends NotifyMeError
  */
-export class DomainError extends NotifyMeError {}
+export class DomainError extends NotifyMeError { }
 
 /**
  * Error thrown when a client attempts to create or update a record

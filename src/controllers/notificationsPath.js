@@ -35,9 +35,6 @@ export default function pathController(config, logger, fsManager) {
       const { error: notificationError, value: fieldsToUpdate } =
         notificationSchema.validate(req.body);
       if (notificationError) {
-        logger.warn(
-          `Request body validation error. Request: ${req.method} /notifications/${req.params.id}`
-        );
         throw new NotificationValidationError(notificationError);
       }
 

@@ -24,8 +24,10 @@ export default function validationErrorHandler(config, logger) {
   return (err, req, res, next) => {
     if (!(err instanceof ValidationError)) return next(err);
 
-    logger.debug(
-      `Validation error handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl}`
+    const clientIp = req.ip || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    logger.warn(
+      `${err.name} handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`
     );
 
     res.status(err.status).json({
