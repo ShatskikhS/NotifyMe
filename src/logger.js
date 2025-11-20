@@ -5,13 +5,13 @@ const { combine, timestamp, printf, colorize, errors, json } = format;
 /**
  * Main logger class that wraps Winston logger.
  * Provides a configured logger instance for the application.
- * 
+ *
  * @class MainLogger
  */
 export default class MainLogger {
   /**
    * Creates a new MainLogger instance.
-   * 
+   *
    * @param {Object} options - Logger configuration options
    * @param {boolean} [options.debug=false] - Enable debug mode (adds console transport)
    * @param {string} [options.combinedPath="logs/combined.log"] - Path to combined log file
@@ -19,14 +19,19 @@ export default class MainLogger {
    * @param {number} [options.maxFileSize=5000000] - Maximum size of log files in bytes
    * @param {number} [options.maxNumberFiles=5] - Maximum number of log files to keep
    */
-  constructor({ 
-    debug = false, 
-    combinedPath = "logs/combined.log", 
-    errorsPath = "logs/error.log", 
-    maxFileSize = 5_000_000, 
-    maxNumberFiles = 5 
+  constructor({
+    debug = false,
+    combinedPath = "logs/combined.log",
+    errorsPath = "logs/error.log",
+    maxFileSize = 5_000_000,
+    maxNumberFiles = 5,
   } = {}) {
-    const loggerTransports = this._getMainTransports(combinedPath, errorsPath, maxFileSize, maxNumberFiles);
+    const loggerTransports = this._getMainTransports(
+      combinedPath,
+      errorsPath,
+      maxFileSize,
+      maxNumberFiles
+    );
     if (debug) {
       loggerTransports.push(this._getDebugTransport());
     }
@@ -40,7 +45,7 @@ export default class MainLogger {
 
   /**
    * Creates main file transports for logging.
-   * 
+   *
    * @private
    * @param {string} combinedPath - Path to combined log file
    * @param {string} errorsPath - Path to error log file
@@ -74,7 +79,7 @@ export default class MainLogger {
 
   /**
    * Creates console transport for debug mode.
-   * 
+   *
    * @private
    * @returns {winston.transports.Console} Console transport
    */
@@ -103,12 +108,12 @@ export default class MainLogger {
     return this.logger.info(...args);
   }
 
-  debug(...args) {
-    return this.logger.debug(...args);
+  http(...args) {
+    return this.logger.http(...args);
   }
 
-  verbose(...args) {
-    return this.logger.verbose(...args);
+  debug(...args) {
+    return this.logger.debug(...args);
   }
 
   silly(...args) {

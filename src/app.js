@@ -1,5 +1,3 @@
-// app.js
-// Точка входа Express-приложения
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -15,6 +13,7 @@ import crateNotifyRouter from "./routes/notificationsRouter.js";
 import validationErrorHandler from "./middlewares/errorHandlers/validationErrorHandler.js";
 import domainErrorHandler from "./middlewares/errorHandlers/domainErrorHandler.js";
 import globalErrorHandler from "./middlewares/errorHandlers/globalErrorHandler.js";
+import httpLoggerMiddleware from "./middlewares/httpLogMiddleware.js"
 
 let config;
 let mainLogger;
@@ -27,10 +26,12 @@ try {
 } catch (err) {
   console.error("Failed to initialize application configuration:");
   console.error(err.message);
+  console.error(err.stack);
   process.exit(1);
 }
 
 const app = express();
+app.use(httpLoggerMiddleware(mainLogger));
 app.use(express.json());
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 100 }));

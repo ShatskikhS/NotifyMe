@@ -24,8 +24,10 @@ export default function domainErrorHandler(config, logger) {
   return (err, req, res, next) => {
     if (!(err instanceof DomainError)) return next(err);
 
-    logger.debug(
-      `Domain error handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl}`
+    const clientIp = req.ip || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    logger.warn(
+      `${err.name} handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`
     );
 
     res.status(err.status).json({

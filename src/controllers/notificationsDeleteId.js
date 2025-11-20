@@ -35,11 +35,6 @@ export default function deleteIdController(config, logger, fsManager) {
       const notification = await fsManager.findByIdAsync(currentId);
 
       if (!notification.sendAt || (new Date(notification.sendAt) <= new Date())) {
-        const clientIp = req.ip || 'unknown';
-        const userAgent = req.headers['user-agent'] || 'unknown';
-        logger.warn(
-          `NotScheduledNotificationError error handled: 409 Conflict - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`
-        );
         const message = config.debug
           ? `The attempt to delete unscheduled 'id=${currentId}' notification has been rejected.`
           : "Invalid request";

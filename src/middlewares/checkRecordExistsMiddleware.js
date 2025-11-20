@@ -13,9 +13,6 @@ export default function checkRecordExistsMiddleware(config, logger, fsManager) {
     try {
         const id = req.params.id;
       if (!fsManager.hasId(id)) {
-        const clientIp = req.ip || 'unknown';
-        const userAgent = req.headers['user-agent'] || 'unknown';
-        logger.warn(`RecordNotFoundDomainError error handled: 404 Not Found - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`);
         const message = config.debug
         ? `Parameter '/:id' = ${id} was not found in the storage.`
         : "Invalid request";

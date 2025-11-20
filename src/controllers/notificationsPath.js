@@ -44,13 +44,8 @@ export default function pathController(config, logger, fsManager) {
       const notification = await fsManager.findByIdAsync(currentId);
 
       if (!notification.sendAt || (new Date(notification.sendAt) <= new Date())) {
-        const clientIp = req.ip || 'unknown';
-        const userAgent = req.headers['user-agent'] || 'unknown';
-        logger.warn(
-          `NotScheduledNotificationError error handled: 409 Conflict - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`
-        );
         const message = config.debug
-          ? `The attempt to update unscheduled id ${currentId} notification has been rejected.`
+          ? `The attempt to update unscheduled id ${currentId} notification has been rejected`
           : "Invalid request";
         throw new NotScheduledNotificationError(currentId, message);
       }
@@ -60,8 +55,7 @@ export default function pathController(config, logger, fsManager) {
       } else {
         Object.assign(notification, fieldsToUpdate);
         await fsManager.updateAsync(notification);
-
-        logger.info(`Controller: Notification id: ${notification.id} successfully updated.`);
+        logger.info(`Controller: Notification id: ${notification.id} successfully updated`);
 
         res.status(200).json({
           status: "ok",
