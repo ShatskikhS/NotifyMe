@@ -25,7 +25,6 @@ try {
   fsManager = new FsNotifications(config.notificationsFile, mainLogger, config.debug);
 } catch (err) {
   console.error("Failed to initialize application configuration:");
-  console.error(err.message);
   console.error(err.stack);
   process.exit(1);
 }

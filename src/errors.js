@@ -41,16 +41,11 @@ export class CliOptionError extends ConfigurationError { }
  *
  * @class InvalidStorageFileError
  * @extends EnvironmentValueError
- * @property {string} filePath - The path to the invalid JSON file.
+ * 
  * @example
  * throw new InvalidStorageFileError("/data/notifications.json");
  */
-export class InvalidStorageFileError extends EnvironmentValueError {
-  constructor(filePath) {
-    super(`Invalid JSON storage structure in file: ${filePath}`);
-    this.filePath = filePath;
-  }
-}
+export class InvalidStorageFileError extends EnvironmentValueError { }
 
 /**
  * Validation errors.

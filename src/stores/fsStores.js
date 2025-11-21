@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { promises as fsPromises } from "node:fs";
 
+import createStorageSchema from "../validation/storageSchema.js";
 import {
   DuplicateIdError,
   RecordNotFoundError,
@@ -61,12 +62,6 @@ export default class FsNotifications {
     this.#debugMode = debugMode;
 
     this.#initStorage();
-
-    const rawData = fs.readFileSync(this.#path);
-    this.#allIDs = Object.keys(JSON.parse(rawData)).map(Number);
-    this.#logger.debug(
-      `Storage initialized with ${this.#allIDs.length} records.`
-    );
   }
 
   /**
@@ -82,8 +77,17 @@ export default class FsNotifications {
         `Storage file '${this.#path}' not found — created new empty JSON storage.`
       );
     } else {
-      // TODO: validate existing file.
-      this.#logger.info(`Existing storage file '${this.#path}' loaded.`);
+      this.#logger.info(`Loading existing storage file '${this.#path}'`);
+      const storageData = JSON.parse(fs.readFileSync(this.#path));
+      const storageSchema = createStorageSchema();
+      const { error } = storageSchema.validate(storageData);
+      if (error) {
+        throw new InvalidStorageFileError(`${error.message} | path: ${this.#path}`);
+      }
+      this.#allIDs = Object.keys(storageData).map(Number);
+      this.#logger.debug(
+        `Storage initialized with ${this.#allIDs.length} records.`
+      );
     }
   }
 

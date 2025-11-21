@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { SOURCES, CHANNELS, PRIORITIES } from "../models/consts/notificationFields.js"
+import { DEBUG_MESSAGES, PRODUCTION_MESSAGES } from "../models/consts/notificationMessages.js"
 
 /**
  * Maximum number of days in the future that a notification can be scheduled.
@@ -7,43 +8,10 @@ import { SOURCES, CHANNELS, PRIORITIES } from "../models/consts/notificationFiel
  */
 const MAX_FUTURE_DAYS = 30;
 
-/**
- * Detailed error messages for validation errors in debug mode.
- * Provides specific information about what went wrong and how to fix it.
- * @type {Record<string, string>}
- */
 const debugMessages = {
-  "string.base": "Field must be a string",
-  "any.required": "{#label} field is required",
-  "any.only":
-    '"{#value}" is invalid value for {#label}. Allowed values are: {#valids}',
-  "array.base": "Field must be an array",
-  "array.min": "Array must contain at least {#limit} item",
-  "array.unique": 'Duplicate values not allowed. Duplicate field: {#label}, value: "{#dupeValue}".',
-  "date.base": "Field must be a valid date",
-  "date.format": "Date must be in ISO 8601 format (e.g. 2025-10-21T08:00:00Z)",
-  "date.greater": "Date must be in the future",
+  ...DEBUG_MESSAGES,
   "date.less": `Date cannot be more than ${MAX_FUTURE_DAYS} days in the future`,
-  "object.unknown": 'Field "unknownField" is not allowed in the request',
-};
 
-/**
- * Generic error messages for validation errors in production mode.
- * Provides minimal information to avoid exposing internal details.
- * @type {Record<string, string>}
- */
-const productionMessages = {
-  "string.base": "Invalid format",
-  "any.required": "Required field missing",
-  "any.only": "Invalid value",
-  "array.base": "Invalid format",
-  "array.min": "Invalid value",
-  "array.unique": "Duplicate values not allowed",
-  "date.base": "Invalid date",
-  "date.format": "Invalid date format",
-  "date.greater": "Invalid date",
-  "date.less": "Invalid date",
-  "object.unknown": "Invalid request structure",
 };
 
 /**
@@ -111,7 +79,7 @@ function createNotificationSchema(debug = false) {
     ["source", "message", "channels"],
     (field) => field.required()
   );
-  return schema.messages(debug ? debugMessages : productionMessages);
+  return schema.messages(debug ? debugMessages : PRODUCTION_MESSAGES);
 }
 
 /**
@@ -147,7 +115,7 @@ function createNotificationSchema(debug = false) {
  * }
  */
 function updateNotificationSchema(debug = false) {
-  const messages = debug ? debugMessages : productionMessages;
+  const messages = debug ? debugMessages : PRODUCTION_MESSAGES;
 
   return getBaseNotificationSchema()
     .fork(["source", "message", "channels", "priority", "sendAt"], (field) =>
