@@ -78,7 +78,7 @@ export default class FsNotifications {
       );
     } else {
       this.#logger.info(`Loading existing storage file '${this.#path}'`);
-      const storageData = JSON.parse(fs.readFileSync(this.#path));
+      const storageData = JSON.parse(fs.readFileSync(this.#path, "utf-8"));
       const storageSchema = createStorageSchema();
       const { error } = storageSchema.validate(storageData);
       if (error) {

@@ -42,10 +42,11 @@ test.each(cases)(
     vi.doMock("../../src/config/env.js", () => ({
       default: envOptions,
     }));
+    const { default: Config } = await import("../../src/config/config.js");
     if (expectedError) {
-      await expect(import("../../src/config/config.js")).rejects.toThrow();
+      expect(() => {const config = new Config()}).toThrow();
     } else {
-      const { default: config } = await import("../../src/config/config.js");
+      const config = new Config();
       expect(config).toMatchObject(expected);
     }
   }

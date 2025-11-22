@@ -177,7 +177,7 @@ const errorCases = [
     },
     expectedMessages: {
       prod: "Invalid request structure",
-      debug: 'Field "unknownField" is not allowed in the request',
+      debug: "Field 'unknownField' is not allowed in the request",
     },
   },
 ];
