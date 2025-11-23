@@ -71,6 +71,8 @@ export default class FsNotifications {
    * @private
    */
   #initStorage() {
+    console.log("Inside init storage");
+    console.log(`fs.existsSync() = ${fs.existsSync()}`)
     if (!fs.existsSync(this.#path)) {
       fs.writeFileSync(this.#path, JSON.stringify({}), { flag: "w" });
       this.#logger.info(
@@ -168,7 +170,6 @@ export default class FsNotifications {
    * @returns {Promise<Object<number, import('../models/notificationModel.js').default>>} Object mapping notification IDs to Notification instances
    */
   async findAllAsync() {
-    this.#logger.debug(`Reading all notifications from '${this.#path}'.`);
     const rawData = await fsPromises.readFile(this.#path);
     return JSON.parse(rawData);
   }
