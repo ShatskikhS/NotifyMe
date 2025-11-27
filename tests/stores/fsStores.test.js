@@ -9,6 +9,7 @@ const mockedLogger = {
   http: vi.fn(),
   debug: vi.fn(),
   silly: vi.fn(),
+  formatMessage: vi.fn((service, message, params) => `[${service}]: ${message}`),
 };
 
 describe("storage initialization", () => {

@@ -1,5 +1,6 @@
 import { ValidationError } from "../../errors.js";
 import { STATUS_TEXT } from "../../models/consts/statusTexts.js";
+import { SERVICE_NAMES } from "../../models/consts/serviceNames.js";
 
 /**
  * Express error handler middleware factory for validation errors.
@@ -27,7 +28,14 @@ export default function validationErrorHandler(config, logger) {
     const clientIp = req.ip || 'unknown';
     const userAgent = req.headers['user-agent'] || 'unknown';
     logger.warn(
-      `${err.name} handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl} | Client: ${clientIp} | User-Agent: ${userAgent}`
+      logger.formatMessage(SERVICE_NAMES.VALIDATION, `${err.name} handled`, {
+        status: err.status,
+        statusText: STATUS_TEXT[err.status],
+        method: req.method,
+        url: req.originalUrl,
+        client: clientIp,
+        userAgent: userAgent,
+      })
     );
 
     res.status(err.status).json({

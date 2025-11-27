@@ -1,4 +1,5 @@
 import morgan from "morgan";
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 
 /**
  * Middleware for logging HTTP requests using Morgan.
@@ -8,6 +9,11 @@ import morgan from "morgan";
  */
 export default function httpLoggerMiddleware(logger) {
   return morgan("combined", {
-    stream: { write: (message) => logger.http(message.trim()) },
+    stream: {
+      write: (message) =>
+        logger.http(
+          logger.formatMessage(SERVICE_NAMES.REQUEST, message.trim())
+        ),
+    },
   });
 }

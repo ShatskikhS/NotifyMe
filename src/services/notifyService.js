@@ -3,6 +3,7 @@ import sendEmailNotificationAsync from "./channels/email.js";
 import sendLogfileNotificationAsync from "./channels/logfile.js";
 import sendTelegramNotificationAsync from "./channels/telegram.js";
 import { STATUSES } from "../models/consts/notificationFields.js"
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 
 const CHANNELS_METHODS = Object.freeze({
   console: sendConsoleNotificationAsync,
@@ -23,15 +24,31 @@ export default async function sendNotificationAsync(id, logger, fsManager) {
   for (const channel of notification.channels) {
     try {
       await CHANNELS_METHODS[channel](notification.message);
-      logger.debug(`NotificationService: Notification sent | id ${notification.id} | channel ${channel}`);
+      logger.debug(
+        logger.formatMessage(SERVICE_NAMES.NOTIFICATION_SERVICE, "Notification sent", {
+          id: notification.id,
+          channel,
+        })
+      );
     } catch (err) {
-      logger.error(`ErrorSendingNotification: details ${err.stack ?? err.message}`);
+      logger.error(
+        logger.formatMessage(SERVICE_NAMES.NOTIFICATION_SERVICE, "Error sending notification", {
+          errorType: err.name,
+          error: err.stack ?? err.message,
+        })
+      );
       isDelivered = false;
     }
   }
   if (isDelivered) {
     notification.status = STATUSES.DELIVERED;
-    logger.info(`NotificationService: Notification sent to all channels | id ${notification.id}`);
+    logger.info(
+      logger.formatMessage(
+        SERVICE_NAMES.NOTIFICATION_SERVICE,
+        "Notification sent to all channels",
+        { id: notification.id }
+      )
+    );
   } else {
     notification.status = STATUSES.DELIVERY_ERROR;
   }

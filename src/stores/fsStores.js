@@ -11,6 +11,7 @@ import {
   InvalidStorageFileError,
   DeserializationError,
 } from "../errors.js";
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 
 /**
  * File system storage for notifications.
@@ -76,10 +77,19 @@ export default class FsNotifications {
     if (!fs.existsSync(this.#path)) {
       fs.writeFileSync(this.#path, JSON.stringify({}), { flag: "w" });
       this.#logger.info(
-        `Storage file '${this.#path}' not found — created new empty JSON storage.`
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Storage file '${this.#path}' not found — created new empty JSON storage.`
+        )
       );
     } else {
-      this.#logger.info(`Loading existing storage file '${this.#path}'`);
+      this.#logger.info(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Loading existing storage file`,
+          { path: this.#path }
+        )
+      );
       const storageData = JSON.parse(fs.readFileSync(this.#path, "utf-8"));
       const storageSchema = createStorageSchema();
       const { error } = storageSchema.validate(storageData);
@@ -88,7 +98,11 @@ export default class FsNotifications {
       }
       this.#allIDs = Object.keys(storageData).map(Number);
       this.#logger.debug(
-        `Storage initialized with ${this.#allIDs.length} records.`
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Storage initialized`,
+          { recordCount: this.#allIDs.length }
+        )
       );
     }
   }
@@ -112,20 +126,34 @@ export default class FsNotifications {
    */
   async saveAsync(notification) {
     if (notification.id && this.#allIDs.includes(notification.id)) {
-      this.#logger.warn(`Attempt to save duplicate ID ${notification.id}.`);
+      this.#logger.warn(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Attempt to save duplicate ID`,
+          { id: notification.id }
+        )
+      );
       const message = this.#debugMode
         ? `Record with id "${notification.id}" already exists`
         : "Invalid value";
       throw new DuplicateIdError(message, notification.id);
     }
 
-    this.#logger.info(`Saving new notification...`);
+    this.#logger.info(
+      this.#logger.formatMessage(SERVICE_NAMES.FILE_STORAGE, `Saving new notification...`)
+    );
 
     const allNotifications = await this.findAllAsync();
 
     if (!notification.id) {
       notification.id = this.getNextId();
-      this.#logger.debug(`Generated new ID: ${notification.id}`);
+      this.#logger.debug(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Generated new ID`,
+          { id: notification.id }
+        )
+      );
     }
 
     allNotifications[notification.id] = notification;
@@ -135,7 +163,13 @@ export default class FsNotifications {
     );
     this.#allIDs.push(notification.id);
 
-    this.#logger.info(`Notification ${notification.id} saved.`);
+    this.#logger.info(
+      this.#logger.formatMessage(
+        SERVICE_NAMES.FILE_STORAGE,
+        `Notification saved`,
+        { id: notification.id }
+      )
+    );
 
     return notification.id;
   }
@@ -150,14 +184,26 @@ export default class FsNotifications {
    */
   async findByIdAsync(id) {
     if (!this.#allIDs.includes(id)) {
-      this.#logger.warn(`Attempted to find non-existent record ID ${id}.`);
+      this.#logger.warn(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Attempted to find non-existent record`,
+          { id }
+        )
+      );
       const message = this.#debugMode
         ? `Record with id '${id}' not found`
         : "Invalid value";
       throw new RecordNotFoundError(message, id);
     }
 
-    this.#logger.debug(`Finding notification with ID ${id}.`);
+    this.#logger.debug(
+      this.#logger.formatMessage(
+        SERVICE_NAMES.FILE_STORAGE,
+        `Finding notification`,
+        { id }
+      )
+    );
     const allNotifications = await this.findAllAsync();
     return allNotifications[id];
   }
@@ -200,7 +246,11 @@ export default class FsNotifications {
   async updateAsync(notification) {
     if (!this.#allIDs.includes(notification.id)) {
       this.#logger.warn(
-        `Attempted to update missing record ID ${notification.id}.`
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Attempted to update missing record`,
+          { id: notification.id }
+        )
       );
       const message = this.#debugMode
         ? `Record with id '${notification.id}' not found`
@@ -208,7 +258,13 @@ export default class FsNotifications {
       throw new RecordNotFoundError(message, notification.id);
     }
 
-    this.#logger.info(`Updating notification ${notification.id}.`);
+    this.#logger.info(
+      this.#logger.formatMessage(
+        SERVICE_NAMES.FILE_STORAGE,
+        `Updating notification`,
+        { id: notification.id }
+      )
+    );
     const allNotifications = await this.findAllAsync();
     allNotifications[notification.id] = notification;
     await fsPromises.writeFile(
@@ -216,7 +272,13 @@ export default class FsNotifications {
       JSON.stringify(allNotifications, null, 2)
     );
 
-    this.#logger.debug(`Notification ${notification.id} updated successfully.`);
+    this.#logger.debug(
+      this.#logger.formatMessage(
+        SERVICE_NAMES.FILE_STORAGE,
+        `Notification updated successfully`,
+        { id: notification.id }
+      )
+    );
   }
 
   /**
@@ -228,14 +290,26 @@ export default class FsNotifications {
    */
   async deleteAsync(id) {
     if (!this.#allIDs.includes(id)) {
-      this.#logger.warn(`Attempted to delete missing record ID ${id}.`);
+      this.#logger.warn(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.FILE_STORAGE,
+          `Attempted to delete missing record`,
+          { id }
+        )
+      );
       const message = this.#debugMode
         ? `Record with id '${id}' not found`
         : "Invalid value";
       throw new RecordNotFoundError(message, id);
     }
 
-    this.#logger.debug(`Deleting notification ${id}.`);
+    this.#logger.debug(
+      this.#logger.formatMessage(
+        SERVICE_NAMES.FILE_STORAGE,
+        `Deleting notification`,
+        { id }
+      )
+    );
     const allNotifications = await this.findAllAsync();
     delete allNotifications[id];
     await fsPromises.writeFile(
@@ -245,7 +319,11 @@ export default class FsNotifications {
 
     this.#allIDs.splice(this.#allIDs.indexOf(id), 1);
     this.#logger.debug(
-      `Notification ${id} deleted. Remaining count: ${this.#allIDs.length}`
+      this.#logger.formatMessage(
+        SERVICE_NAMES.FILE_STORAGE,
+        `Notification deleted`,
+        { id, remainingCount: this.#allIDs.length }
+      )
     );
   }
 

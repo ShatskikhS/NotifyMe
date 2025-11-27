@@ -37,7 +37,6 @@ export default function validateIdMiddleware(config, logger) {
         throw new IdValidationError(error);
       }
 
-      // Replace req.params.id with validated number value
       req.params.id = validatedId;
 
       next();

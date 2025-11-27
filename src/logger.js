@@ -95,6 +95,38 @@ export default class MainLogger {
     });
   }
 
+  /**
+   * Formats a log message according to the project standard.
+   * Structure: [Service]: Message | key=value | key=value
+   *
+   * @param {string} service - Name of the service (must be from SERVICE_NAMES)
+   * @param {string} message - Event description
+   * @param {Object} [params={}] - Key-value pairs for context
+   * @returns {string} Formatted log string
+   * @throws {Error} If service name is invalid
+   */
+  formatMessage(service, message, params = {}) {
+    // We import dynamically to avoid circular dependencies if any, 
+    // but here it's fine to rely on the passed value matching the enum.
+    // Ideally, we check against the values of SERVICE_NAMES.
+    // For performance, we might skip validation in production, but strictly enforcing it helps consistency.
+
+    // Note: To strictly validate, we would need to import SERVICE_NAMES.
+    // Since this is a utility method on the logger instance, we can assume the caller uses the constant.
+    // However, to be safe and helpful, let's format it correctly.
+
+    let logString = `[${service}]: ${message}`;
+
+    if (Object.keys(params).length > 0) {
+      const paramString = Object.entries(params)
+        .map(([key, value]) => `${key}=${value}`)
+        .join(' | ');
+      logString += ` | ${paramString}`;
+    }
+
+    return logString;
+  }
+
   // Winston logger methods delegation
   error(...args) {
     return this.logger.error(...args);

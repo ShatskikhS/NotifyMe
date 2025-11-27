@@ -19,6 +19,7 @@ describe('notifyService Verification', () => {
       info: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
+      formatMessage: vi.fn((service, message, params) => `[${service}]: ${message}`),
     };
     mockFsManager = {
       findByIdAsync: vi.fn(),

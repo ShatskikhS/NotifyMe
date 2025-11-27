@@ -1,3 +1,5 @@
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
+
 /**
  * Express controller middleware factory for handling requests to retrieve
  * a specific notification by ID.
@@ -32,7 +34,11 @@ export default function getIdController(config, logger, fsManager) {
       const currentId = req.params.id;
 
       logger.debug(
-        `Processing a request to receive notification with id: ${currentId}.`
+        logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_CONTROLLER,
+          "Processing request to receive notification",
+          { id: currentId }
+        )
       );
 
       const notification = await fsManager.findByIdAsync(currentId);

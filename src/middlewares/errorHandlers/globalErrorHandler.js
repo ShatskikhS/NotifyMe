@@ -1,5 +1,6 @@
 import { NotifyMeError } from "../../errors.js";
 import { STATUS_TEXT } from "../../models/consts/statusTexts.js";
+import { SERVICE_NAMES } from "../../models/consts/serviceNames.js";
 
 /**
  * Express error handler middleware factory for global error handling.
@@ -22,7 +23,13 @@ export default function globalErrorHandler(config, logger) {
   return (err, req, res, _) => {
     const tag = err instanceof NotifyMeError ? "NotifyMeError" : "UnknownError";
     logger.error(
-      `[${tag}] ${req.method} ${req.originalUrl}\n${err.stack || err.message}`
+      logger.formatMessage(SERVICE_NAMES.SERVER, "Unhandled exception", {
+        tag,
+        errorType: err.name,
+        method: req.method,
+        url: req.originalUrl,
+        error: err.stack || err.message,
+      })
     );
 
     res.status(err.status ?? 500).json({

@@ -13,6 +13,7 @@ describe('NotificationScheduler Verification', () => {
       info: vi.fn(),
       error: vi.fn(),
       warn: vi.fn(),
+      formatMessage: vi.fn((service, message, params) => `[${service}]: ${message}`),
     };
     mockFsManager = {
       findUnsent: vi.fn().mockReturnValue([]),

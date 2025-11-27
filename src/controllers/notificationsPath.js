@@ -1,5 +1,6 @@
 import { updateNotificationSchema } from "../validation/notifySchema.js";
 import { NotificationValidationError, NotScheduledNotificationError } from "../errors.js";
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 
 /**
  * Express controller middleware factory for handling requests to update
@@ -54,7 +55,13 @@ export default function pathController(config, logger, fsManager, scheduler) {
         scheduler.reschedule(notification)
       }
       await fsManager.updateAsync(notification);
-      logger.info(`Controller: Notification id: ${notification.id} successfully updated`);
+      logger.info(
+        logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_CONTROLLER,
+          "Notification updated",
+          { id: notification.id }
+        )
+      );
 
       res.status(200).json({
         status: "ok",

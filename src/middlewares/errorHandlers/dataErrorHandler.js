@@ -1,5 +1,6 @@
 import { DataError } from "../../errors.js";
 import { STATUS_TEXT } from "../../models/consts/statusTexts.js";
+import { SERVICE_NAMES } from "../../models/consts/serviceNames.js";
 
 /**
  * Creates an Express error handler middleware for data errors.
@@ -39,7 +40,12 @@ export default function createDataErrorHandler(config, logger) {
     if (!(err instanceof DataError)) return next(err);
 
     logger.debug(
-      `DataError handled: ${err.status} ${STATUS_TEXT[err.status]} - ${req.method} ${req.originalUrl}`
+      logger.formatMessage(SERVICE_NAMES.VALIDATION, "DataError handled", {
+        status: err.status,
+        statusText: STATUS_TEXT[err.status],
+        method: req.method,
+        url: req.originalUrl,
+      })
     );
 
     res.status(err.status).json({

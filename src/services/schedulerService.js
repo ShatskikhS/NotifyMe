@@ -2,6 +2,7 @@ import { scheduleJob } from "node-schedule";
 
 import sendNotificationAsync from "./notifyService.js"
 import { NotificationSchedulingError } from "../errors.js";
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 
 
 export default class NotificationScheduler {
@@ -50,10 +51,22 @@ export default class NotificationScheduler {
       try {
         this.schedule(notification);
       } catch (err) {
-        this.#logger.error(`Failed to schedule notification during init: id ${notification.id} | ${err.message}`);
+        this.#logger.error(
+          this.#logger.formatMessage(
+            SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+            "Failed to schedule notification during init",
+            { id: notification.id, errorType: err.name, error: err.message }
+          )
+        );
       }
     }
-    this.#logger.info(`NotificationScheduler initialized. ${this.#allTasks.size} notifications scheduled.`)
+    this.#logger.info(
+      this.#logger.formatMessage(
+        SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+        "NotificationScheduler initialized",
+        { scheduledCount: this.#allTasks.size }
+      )
+    );
   }
 
   /**
@@ -67,10 +80,22 @@ export default class NotificationScheduler {
         await sendNotificationAsync(notification.id, this.#logger, this.#fsManager);
       });
 
-      this.#logger.info(`Notification Scheduled: id ${notification.id}`);
+      this.#logger.info(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "Notification Scheduled",
+          { id: notification.id }
+        )
+      );
       this.#allTasks.set(notification.id, job);
     } catch (err) {
-      this.#logger.error(`NotificationSchedulingError: id ${notification.id} | details ${err.stack ?? err.message}`);
+      this.#logger.error(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "NotificationSchedulingError",
+          { id: notification.id, errorType: err.name, error: err.stack ?? err.message }
+        )
+      );
       throw new NotificationSchedulingError(`NotificationSchedulingError: id ${notification.id}`);
     }
   }
@@ -83,15 +108,33 @@ export default class NotificationScheduler {
   reschedule(notification) {
     const job = this.#allTasks.get(notification.id);
     if (!job) {
-      this.#logger.warn(`Attempted to reschedule non-existent job: id ${notification.id}`);
+      this.#logger.warn(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "Attempted to reschedule non-existent job",
+          { id: notification.id }
+        )
+      );
       return;
     }
     const success = job.reschedule(notification.sendAt);
     if (success) {
-      this.#logger.info(`Notification Rescheduled: id ${notification.id}`);
+      this.#logger.info(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "Notification Rescheduled",
+          { id: notification.id }
+        )
+      );
     } else {
       const errMessage = `Failed to reschedule job: id ${notification.id}`;
-      this.#logger.error(`NotificationSchedulingError: ${errMessage}`);
+      this.#logger.error(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "NotificationSchedulingError",
+          { errorType: "NotificationSchedulingError", error: errMessage }
+        )
+      );
       throw new NotificationSchedulingError(errMessage);
     }
   }
@@ -104,16 +147,34 @@ export default class NotificationScheduler {
   unschedule(notification) {
     const job = this.#allTasks.get(notification.id);
     if (!job) {
-      this.#logger.warn(`Attempted to unschedule non-existent job: id ${notification.id}`);
+      this.#logger.warn(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "Attempted to unschedule non-existent job",
+          { id: notification.id }
+        )
+      );
       return;
     }
     const success = job.cancel();
     if (success) {
-      this.#logger.info(`Notification canceled: id ${notification.id}`);
+      this.#logger.info(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "Notification canceled",
+          { id: notification.id }
+        )
+      );
       this.#allTasks.delete(notification.id);
     } else {
       const errMessage = `Failed to cancel job: id ${notification.id}`;
-      this.#logger.error(`NotificationSchedulingError: ${errMessage}`);
+      this.#logger.error(
+        this.#logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_SCHEDULER,
+          "NotificationSchedulingError",
+          { error: errMessage }
+        )
+      );
       throw new NotificationSchedulingError(errMessage);
     }
   }

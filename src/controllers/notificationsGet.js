@@ -1,3 +1,5 @@
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
+
 /**
  * Express controller middleware factory for handling requests to receive
  * information about all notifications.
@@ -21,7 +23,12 @@
 export default function getController(logger, fsManager) {
   return async (req, res, next) => {
     try {
-      logger.debug("Processing a request to receive all notifications.");
+      logger.debug(
+        logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_CONTROLLER,
+          "Processing request to receive all notifications"
+        )
+      );
       const notifications = await fsManager.findAllAsync();
       res.status(200).json(notifications);
     } catch (err) {

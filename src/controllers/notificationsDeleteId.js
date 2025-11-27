@@ -1,4 +1,5 @@
 import { NotScheduledNotificationError } from "../errors.js";
+import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 
 /**
  * Express controller middleware factory for handling requests to delete
@@ -46,7 +47,13 @@ export default function deleteIdController(config, logger, fsManager, scheduler)
       scheduler.unschedule(notification);
       await fsManager.deleteAsync(currentId);
 
-      logger.info(`Notification id: ${currentId} has been successfully removed.`);
+      logger.info(
+        logger.formatMessage(
+          SERVICE_NAMES.NOTIFICATION_CONTROLLER,
+          "Notification removed",
+          { id: currentId }
+        )
+      );
 
       res.status(200).json({ status: "ok", time: new Date() });
     } catch (err) {
