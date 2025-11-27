@@ -7,9 +7,9 @@ const SOURCES = Object.freeze({
 });
 
 const CHANNELS = Object.freeze({
+  CONSOLE: "console",
   TELEGRAM: "telegram",
   LOGFILE: "logfile",
-  CONSOLE: "console",
   EMAIL: "email",
 });
 

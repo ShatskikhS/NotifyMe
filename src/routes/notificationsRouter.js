@@ -20,6 +20,8 @@ import checkRecordExistsMiddleware from "../middlewares/checkRecordExistsMiddlew
  *   operations and errors during request processing
  * @param {import('../stores/fsStores.js').default} fsManager - FsNotifications instance
  *   for working with local JSON storage of notifications
+ * @param {import('../services/schedulerService.js').default} scheduler - NotificationScheduler
+ * instance for scheduling notifications
  *
  * @returns {import('express').Router} Configured Express router with registered routes
  *
@@ -36,18 +38,18 @@ import checkRecordExistsMiddleware from "../middlewares/checkRecordExistsMiddlew
  * //   "priority": "high",
  * // }
  */
-export default function crateNotifyRouter(config, logger, fsManager) {
+export default function crateNotifyRouter(config, logger, fsManager, scheduler) {
   const router = Router();
 
   // Register ID validation middleware for all routes with :id parameter
   router.param("id", validateIdMiddleware(config, logger));
   router.param("id", checkRecordExistsMiddleware(config, logger, fsManager));
 
-  router.post("/", postController(config, logger, fsManager));
+  router.post("/", postController(config, logger, fsManager, scheduler));
   router.get("/", getController(logger, fsManager));
   router.get("/:id", getIdController(config, logger, fsManager));
-  router.delete("/:id", deleteIdController(config, logger, fsManager));
-  router.patch("/:id", pathController(config, logger, fsManager));
+  router.delete("/:id", deleteIdController(config, logger, fsManager, scheduler));
+  router.patch("/:id", pathController(config, logger, fsManager, scheduler));
 
   return router;
 }

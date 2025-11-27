@@ -1,8 +1,9 @@
 import createValidationSchema from "../validation/notifySchema.js";
 import { NotificationValidationError } from "../errors.js";
 import Notification from "../models/notificationModel.js";
-import { CHANNELS, STATUSES } from "../models/consts/notificationFields.js";
-import sendConsoleNotificationAsync from "../services/channels/console.js";
+import { STATUSES } from "../models/consts/notificationFields.js";
+import sendNotificationAsync from "../services/notifyService.js";
+
 
 /**
  * Express controller middleware factory for handling notification creation requests.
@@ -19,6 +20,9 @@ import sendConsoleNotificationAsync from "../services/channels/console.js";
  *   operations and errors during request processing
  * @param {import('../stores/fsStores.js').default} fsManager - FsNotifications instance
  *   for managing local JSON storage of notifications
+ * @param {import('../services/schedulerService.js').default} scheduler - NotificationScheduler
+ * instance for scheduling notifications
+ * 
  * @returns {function(import('express').Request, import('express').Response, import('express').NextFunction): Promise<void>}
  *   Express controller middleware function
  *
@@ -40,7 +44,7 @@ import sendConsoleNotificationAsync from "../services/channels/console.js";
  * //   "sendAt": "2025-10-21T08:00:00Z"
  * // }
  */
-export default function postController(config, logger, fsManager) {
+export default function postController(config, logger, fsManager, scheduler) {
   return async (req, res, next) => {
     try {
       /**
@@ -65,32 +69,23 @@ export default function postController(config, logger, fsManager) {
        */
       const notification = Notification.fromJSON(rawNotification);
 
-      await fsManager.saveAsync(notification);
+      notification.id = await fsManager.saveAsync(notification);
 
       if (!notification.sendAt) {
-        if (notification.channels.includes(CHANNELS.CONSOLE)) {
-          await sendConsoleNotificationAsync(
-            notification.message,
-            notification.source
-          );
-          logger.info(`Notification id:${notification.id} sent to console`);
-        }
-        if (notification.channels.includes(CHANNELS.LOGFILE)) {
-          logger.info(`New logfile notification: ${notification.message}`);
-        }
-        // TODO: Add code to send notifications to other controllers.
-        if (notification.channels.includes(CHANNELS.EMAIL)) {
-        }
-        if (notification.channels.includes(CHANNELS.TELEGRAM)) {
-        }
+        await sendNotificationAsync(notification, logger);
         notification.status = STATUSES.DELIVERED;
-        await fsManager.updateAsync(notification);
-        res.status(200).json({
-          status: notification.status,
-          notificationId: notification.id,
-          time: new Date(),
-        });
+      } else {
+        scheduler.schedule(notification);
+        notification.status = STATUSES.AWAITING_DELIVERY;
       }
+
+      await fsManager.updateAsync(notification);
+      res.status(200).json({
+        status: notification.status,
+        notificationId: notification.id,
+        time: new Date(),
+      });
+
     } catch (err) {
       next(err);
     }

@@ -15,6 +15,8 @@ import { NotScheduledNotificationError } from "../errors.js";
  *   operations and errors during request processing
  * @param {import('../stores/fsStores.js').default} fsManager - FsNotifications
  *   instance for managing local JSON storage of notifications
+ * @param {import('../services/schedulerService.js').default} scheduler - NotificationScheduler
+ * instance for scheduling notifications
  * @returns {function(import('express').Request, import('express').Response, import('express').NextFunction): Promise<void>}
  *   Express controller middleware function
  *
@@ -27,7 +29,7 @@ import { NotScheduledNotificationError } from "../errors.js";
  * // DELETE request to /notifications/42
  * // Returns: { "status": "ok", "time": "2025-11-13T01:10:20.038Z" }
  */
-export default function deleteIdController(config, logger, fsManager) {
+export default function deleteIdController(config, logger, fsManager, scheduler) {
   return async (req, res, next) => {
     try {
       const currentId = req.params.id;
@@ -41,6 +43,7 @@ export default function deleteIdController(config, logger, fsManager) {
         throw new NotScheduledNotificationError(currentId, message);
       }
 
+      scheduler.unschedule(notification);
       await fsManager.deleteAsync(currentId);
 
       logger.info(`Notification id: ${currentId} has been successfully removed.`);

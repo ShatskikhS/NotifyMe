@@ -7,6 +7,7 @@ import hpp from "hpp";
 import MainLogger from "./logger.js";
 import Config from "./config/config.js";
 import FsNotifications from "./stores/fsStores.js";
+import NotificationScheduler from "./services/schedulerService.js"
 
 import crateNotifyRouter from "./routes/notificationsRouter.js";
 
@@ -18,11 +19,13 @@ import httpLoggerMiddleware from "./middlewares/httpLogMiddleware.js"
 let config;
 let mainLogger;
 let fsManager;
+let scheduler;
 
 try {
   config = new Config();
   mainLogger = new MainLogger({ debug: config.debug });
   fsManager = new FsNotifications(config.notificationsFile, mainLogger, config.debug);
+  scheduler = new NotificationScheduler(mainLogger, fsManager, config.debug);
 } catch (err) {
   console.error("Failed to initialize application configuration:");
   console.error(err.stack);
@@ -37,7 +40,7 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 100 }));
 // app.use(xss());
 app.use(hpp());
 
-app.use("/notifications", crateNotifyRouter(config, mainLogger, fsManager));
+app.use("/notifications", crateNotifyRouter(config, mainLogger, fsManager, scheduler));
 app.get("/", (req, res) => {
   mainLogger.info(`new request. Path: '/', method: ${req.method}`);
   res.status(200).json({ status: "ok", time: Date.now() });
@@ -52,4 +55,4 @@ app.use(domainErrorHandler(config, mainLogger));
 app.use(globalErrorHandler(config, mainLogger));
 
 export default app;
-export { config, mainLogger };
+export { config, mainLogger, scheduler };

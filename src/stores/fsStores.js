@@ -3,6 +3,8 @@ import path from "node:path";
 import { promises as fsPromises } from "node:fs";
 
 import createStorageSchema from "../validation/storageSchema.js";
+import Notification from "../models/notificationModel.js"
+import { STATUSES } from "../models/consts/notificationFields.js"
 import {
   DuplicateIdError,
   RecordNotFoundError,
@@ -71,8 +73,6 @@ export default class FsNotifications {
    * @private
    */
   #initStorage() {
-    console.log("Inside init storage");
-    console.log(`fs.existsSync() = ${fs.existsSync()}`)
     if (!fs.existsSync(this.#path)) {
       fs.writeFileSync(this.#path, JSON.stringify({}), { flag: "w" });
       this.#logger.info(
@@ -172,6 +172,22 @@ export default class FsNotifications {
   async findAllAsync() {
     const rawData = await fsPromises.readFile(this.#path);
     return JSON.parse(rawData);
+  }
+
+  /**
+   * Returns a list of objects that represent unsent notifications.
+   * 
+   * @returns {import("../models/notificationModel.js").default[]}
+   */
+  findUnsent() {
+    const rawData = fs.readFileSync(this.#path, "utf-8");
+    const result = [];
+    for (const rawNotification of Object.values(JSON.parse(rawData))) {
+      if (new Date(rawNotification.sendAt) > new Date && rawNotification.status !== STATUSES.DELIVERED) {
+        result.push(new Notification(rawNotification));
+      }
+    }
+    return result;
   }
 
   /**

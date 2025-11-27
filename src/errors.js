@@ -45,7 +45,7 @@ export class CliOptionError extends ConfigurationError { }
  * @example
  * throw new InvalidStorageFileError("/data/notifications.json");
  */
-export class InvalidStorageFileError extends EnvironmentValueError { }
+export class InvalidStorageFileError extends ConfigurationError { }
 
 /**
  * Validation errors.
@@ -266,5 +266,12 @@ export class NotScheduledNotificationError extends DomainError {
     super(message);
     this.id = id;
     this.status = 409;
+  }
+}
+
+export class NotificationSchedulingError extends NotifyMeError {
+  constructor(message) {
+    super(message);
+    this.status = 500;
   }
 }
