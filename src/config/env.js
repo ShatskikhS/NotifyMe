@@ -25,11 +25,9 @@ const rawEnvOptions = {
 };
 
 /**
- * Validated environment configuration options
+ * Validated environment configuration options.
+ *
  * @type {AppOptions}
- * @property {number|undefined} port - Server port number from PORT env var
- * @property {boolean} debug - Debug mode flag from DEBUG env var
- * @property {string|undefined} notificationsFile - Storage file path from NOTIFICATIONS_FILE env var
  */
 const { error, value: envOptions } = optionsSchema.validate(rawEnvOptions);
 

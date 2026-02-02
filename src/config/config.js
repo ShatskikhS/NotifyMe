@@ -18,22 +18,6 @@ import { EnvironmentValueError } from "../errors.js";
  * Merges configuration from CLI parameters and environment variables,
  * with CLI parameters taking precedence. Validates that required
  * configuration values are present.
- *
- * @class Config
- * @property {number} port - Server port number (required)
- * @property {boolean} debug - Debug mode flag (defaults to false)
- * @property {string} notificationsFile - Path to JSON notifications storage file
- *                                        (defaults to "data/allNotifications.json")
- *
- * @example
- * // Use default CLI and env options
- * const config = new Config();
- *
- * // Or provide custom options
- * const customConfig = new Config(
- *   { port: 3000, debug: true },
- *   { port: 8080, notificationsFile: "custom.json" }
- * );
  */
 export default class Config {
   /**
@@ -47,12 +31,26 @@ export default class Config {
    * @throws {EnvironmentValueError} If the port number is not specified in either CLI or environment
    */
   constructor(cliParams = cliOptions, envParams = envOptions) {
+    /**
+     * Server port number.
+     * @type {number}
+     */
     this.port = cliParams.port ?? envParams.port;
     if (this.port === undefined)
       throw new EnvironmentValueError(
         "The port number value must be specified in one of the following ways: via a cli parameter, an environment variable, or .env file."
       );
+
+    /**
+     * Debug mode flag.
+     * @type {boolean}
+     */
     this.debug = cliParams.debug ?? envParams.debug ?? false;
+
+    /**
+     * Path to JSON notifications storage file.
+     * @type {string}
+     */
     this.notificationsFile = cliParams.notificationsFile ?? envParams.notificationsFile ?? "data/allNotifications.json";
   }
 }

@@ -8,34 +8,39 @@ import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 export default class NotificationScheduler {
   /**
    * Main logger instance used to produce typed logs.
-   *
    * @type {import("../logger.js").default}
    * @private
    */
   #logger;
 
   /**
-   * 
-   * @type {import ("../stores/fsStores.js").default}
+   * Storage manager instance.
+   * @type {import("../stores/fsStores.js").default}
+   * @private
    */
   #fsManager;
 
   /**
    * Map of all scheduled tasks, where key is the notification id.
-   * 
    * @type {Map<number, import("node-schedule").Job>}
    * @private
    */
   #allTasks;
 
   /**
-   * true when server is running in debug mode
-   *
+   * Debug mode flag.
    * @type {boolean}
    * @private
    */
   #debugMode;
 
+  /**
+   * Creates a new NotificationScheduler instance.
+   *
+   * @param {import("../logger.js").default} logger - Logger instance
+   * @param {import("../stores/fsStores.js").default} fsManager - Storage manager instance
+   * @param {boolean} debugMode - Debug mode flag
+   */
   constructor(logger, fsManager, debugMode) {
     this.#logger = logger;
     this.#debugMode = debugMode;
@@ -45,6 +50,10 @@ export default class NotificationScheduler {
     this.#initScheduler();
   }
 
+  /**
+   * Initializes the scheduler by loading unsent notifications from storage.
+   * @private
+   */
   #initScheduler() {
     const notifications = this.#fsManager.findUnsent();
     for (const notification of notifications) {
@@ -70,9 +79,10 @@ export default class NotificationScheduler {
   }
 
   /**
-   * Schedule the notification at notification.sendAt time
-   * 
-   * @param {import("../models/notificationModel.js").default} notification 
+   * Schedules a notification to be sent at a specific time.
+   *
+   * @param {import("../models/notificationModel.js").default} notification - The notification to schedule
+   * @throws {NotificationSchedulingError} If scheduling fails
    */
   schedule(notification) {
     try {
@@ -101,9 +111,10 @@ export default class NotificationScheduler {
   }
 
   /**
-   * Reschedule the notification at notification.sendAt time
-   * 
-   * @param {import("../models/notificationModel.js").default} notification 
+   * Reschedules an existing notification.
+   *
+   * @param {import("../models/notificationModel.js").default} notification - The notification to reschedule
+   * @throws {NotificationSchedulingError} If rescheduling fails
    */
   reschedule(notification) {
     const job = this.#allTasks.get(notification.id);
@@ -140,9 +151,10 @@ export default class NotificationScheduler {
   }
 
   /**
-   * Unschedule the notification
-   * 
-   * @param {import("../models/notificationModel.js").default} notification 
+   * Cancels a scheduled notification.
+   *
+   * @param {import("../models/notificationModel.js").default} notification - The notification to unschedule
+   * @throws {NotificationSchedulingError} If cancellation fails
    */
   unschedule(notification) {
     const job = this.#allTasks.get(notification.id);

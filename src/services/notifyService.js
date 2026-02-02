@@ -13,10 +13,15 @@ const CHANNELS_METHODS = Object.freeze({
 });
 
 /**
- * 
- * @param {import("../models/notificationModel.js").default} notification
- * @param {import("../logger.js").default} logger
- * @param {import("../stores/fsStores.js").default} fsManager
+ * Sends a notification to all configured channels.
+ *
+ * Retrieves the notification by ID, iterates through its channels, and attempts
+ * to send the message. Updates the notification status based on delivery success.
+ *
+ * @param {number} id - The ID of the notification to send
+ * @param {import("../logger.js").default} logger - Logger instance
+ * @param {import("../stores/fsStores.js").default} fsManager - Storage manager instance
+ * @returns {Promise<void>}
  */
 export default async function sendNotificationAsync(id, logger, fsManager) {
   const notification = await fsManager.findByIdAsync(id);

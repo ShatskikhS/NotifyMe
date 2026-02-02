@@ -11,7 +11,12 @@ const JSON_EXTENSION = ".json";
  */
 
 /**
- * Validation schema for application options
+ * Validation schema for application options.
+ *
+ * Validates configuration options from CLI and environment variables.
+ * Ensures port is a number, debug is a boolean, and notificationsFile
+ * has a valid .json extension and no prohibited characters.
+ *
  * @type {Joi.ObjectSchema<AppOptions>}
  */
 const optionsSchema = Joi.object({

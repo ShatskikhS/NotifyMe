@@ -42,6 +42,7 @@ if (error) throw new CliOptionError(error.message);
 
 /**
  * Validated command line options.
+ *
  * @type {AppOptions}
  */
 export default cliOptions;

@@ -1,5 +1,5 @@
 import createIdSchema from "../validation/idSchema.js";
-import { IdValidationError} from "../errors.js";
+import { IdValidationError } from "../errors.js";
 
 /**
  * Middleware for validating notification ID parameter from route.
@@ -8,15 +8,10 @@ import { IdValidationError} from "../errors.js";
  * If validation succeeds, replaces req.params.id with the validated number value.
  * If validation fails, throws IdValidationError which should be caught by error handler.
  *
- * @param {import('express').Request} req - Express request object
- * @param {import('express').Response} res - Express response object
- * @param {import('express').NextFunction} next - Express next middleware function
  * @param {import('../config/config.js').default} config - Application configuration
  *   instance containing settings (e.g., debug mode)
  * @param {import('../logger.js').default} logger - MainLogger instance for logging
- *
- * @throws {IdValidationError} When the ID parameter validation fails (invalid format,
- *   not a number, or less than 1)
+ * @returns {import('express').RequestHandler} Express middleware function
  *
  * @example
  * // Usage in router:

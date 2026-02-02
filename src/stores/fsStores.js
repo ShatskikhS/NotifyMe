@@ -16,13 +16,10 @@ import { SERVICE_NAMES } from "../models/consts/serviceNames.js";
 /**
  * File system storage for notifications.
  * Manages persistence of Notification objects in a JSON file.
- *
- * @class FsNotifications
  */
 export default class FsNotifications {
   /**
    * Main logger instance used to produce typed logs.
-   *
    * @type {import('../logger.js').default}
    * @private
    */
@@ -31,23 +28,20 @@ export default class FsNotifications {
   /**
    * Cached list of all existing IDs in the storage.
    * Used for validation in saveAsync, updateAsync, and deleteAsync.
-   *
    * @type {number[]}
    * @private
    */
   #allIDs;
 
   /**
-   * true when server is running in debug mode
-   *
+   * Debug mode flag.
    * @type {boolean}
    * @private
    */
   #debugMode;
 
   /**
-   * Validated storage path
-   * 
+   * Validated storage path.
    * @type {string}
    * @private
    */
@@ -58,6 +52,7 @@ export default class FsNotifications {
    *
    * @param {string} storagePath - Path to the JSON storage file
    * @param {import('../logger.js').default} logger - MainLogger instance for logging
+   * @param {boolean} debugMode - Debug mode flag
    */
   constructor(storagePath, logger, debugMode) {
     this.#path = path.normalize(storagePath);
@@ -70,8 +65,8 @@ export default class FsNotifications {
   /**
    * Initializes the storage file if it doesn't exist.
    * Creates an empty JSON object file.
-   *
    * @private
+   * @throws {InvalidStorageFileError} If the existing storage file is invalid
    */
   #initStorage() {
     if (!fs.existsSync(this.#path)) {
@@ -121,8 +116,8 @@ export default class FsNotifications {
    * Saves a Notification object to the storage.
    *
    * @param {import('../models/notificationModel.js').default} notification - Notification instance to save
-   * @returns {Promise<number>}
-   * @throws {DuplicateIdError} If the notification cannot be saved cause duplicated id
+   * @returns {Promise<number>} The ID of the saved notification
+   * @throws {DuplicateIdError} If the notification ID already exists
    */
   async saveAsync(notification) {
     if (notification.id && this.#allIDs.includes(notification.id)) {
@@ -179,8 +174,7 @@ export default class FsNotifications {
    *
    * @param {number} id - The notification ID to search for
    * @returns {Promise<import('../models/notificationModel.js').default>} Notification instance if found
-   * @throws {RecordNotFoundError} If a record with the required ID is not found.
-   * @throws {DeserializationError} If the stored data cannot be deserialized into a Notification instance.
+   * @throws {RecordNotFoundError} If a record with the required ID is not found
    */
   async findByIdAsync(id) {
     if (!this.#allIDs.includes(id)) {
@@ -210,8 +204,6 @@ export default class FsNotifications {
 
   /**
    * Retrieves all notifications from storage.
-   * Returns an object where keys are notification IDs and values are Notification instances.
-   * Note: The ID is stored both as the key and within the notification object itself.
    *
    * @returns {Promise<Object<number, import('../models/notificationModel.js').default>>} Object mapping notification IDs to Notification instances
    */
@@ -222,8 +214,8 @@ export default class FsNotifications {
 
   /**
    * Returns a list of objects that represent unsent notifications.
-   * 
-   * @returns {import("../models/notificationModel.js").default[]}
+   *
+   * @returns {import("../models/notificationModel.js").default[]} List of unsent notifications
    */
   findUnsent() {
     const rawData = fs.readFileSync(this.#path, "utf-8");
@@ -241,7 +233,7 @@ export default class FsNotifications {
    *
    * @param {import('../models/notificationModel.js').default} notification - Notification instance with updated data
    * @returns {Promise<void>}
-   * @throws {RecordNotFoundError} If a record with the required ID is not found.
+   * @throws {RecordNotFoundError} If a record with the required ID is not found
    */
   async updateAsync(notification) {
     if (!this.#allIDs.includes(notification.id)) {
@@ -286,7 +278,7 @@ export default class FsNotifications {
    *
    * @param {number} id - The notification ID to delete
    * @returns {Promise<void>}
-   * @throws {RecordNotFoundError} If a record with the required ID is not found.
+   * @throws {RecordNotFoundError} If a record with the required ID is not found
    */
   async deleteAsync(id) {
     if (!this.#allIDs.includes(id)) {

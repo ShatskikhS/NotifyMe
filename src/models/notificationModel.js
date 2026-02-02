@@ -1,13 +1,14 @@
 import { DeserializationError } from "../errors.js";
 import { PRIORITIES, STATUSES } from "./consts/notificationFields.js";
 /**
- * Represents a notification in the system
+ * Represents a notification in the system.
  */
 class Notification {
   /**
-   * Creates a new Notification instance
+   * Creates a new Notification instance.
+   *
    * @param {Object} params - The notification parameters
-   * @param {number|undefined} [params.id] - Unique identifier
+   * @param {number} [params.id] - Unique identifier (optional for new notifications)
    * @param {string} params.source - Source of the notification
    * @param {string} [params.priority=PRIORITIES.LOW] - Priority level
    * @param {string} params.message - Notification message
@@ -15,7 +16,6 @@ class Notification {
    * @param {Date|string} [params.sendAt] - Scheduled send date
    * @param {Date|string} [params.receivedAt] - Received date
    * @param {string} [params.status=STATUSES.RECEIVED] - Current status
-   * @throws {Error} When required fields are missing or invalid
    */
   constructor({
     id = undefined,
@@ -27,21 +27,29 @@ class Notification {
     receivedAt,
     status = STATUSES.RECEIVED,
   } = {}) {
+    /** @type {number|undefined} */
     this.id = id;
+    /** @type {string} */
     this.source = source;
+    /** @type {string} */
     this.priority = priority;
+    /** @type {string} */
     this.message = message;
+    /** @type {string[]} */
     this.channels = [...channels];
+    /** @type {Date|null} */
     this.sendAt = sendAt
       ? sendAt instanceof Date
         ? sendAt
         : new Date(sendAt)
       : null;
+    /** @type {Date} */
     this.receivedAt = receivedAt
       ? receivedAt instanceof Date
         ? receivedAt
         : new Date(receivedAt)
       : new Date();
+    /** @type {string} */
     this.status = status;
   }
 
@@ -59,10 +67,11 @@ class Notification {
   }
 
   /**
-   * Creates a Notification instance from a JSON object
+   * Creates a Notification instance from a JSON object.
+   *
    * @param {Object} obj - The JSON object
-   * @returns {Notification}
-   * @throws {DeserializationError} When required fields are missing
+   * @returns {Notification} A new Notification instance
+   * @throws {DeserializationError} When the input object is null or undefined
    */
   static fromJSON(obj) {
     if (!obj) {
